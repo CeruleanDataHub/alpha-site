@@ -1,14 +1,43 @@
 import React from 'react';
 
-let indoorMapId;
-let indoorFloorId;
-
-const onEnter = (event) => {
-    console.log('event : ', event.indoorMap.getIndoorMapId());
-    event.target.setFloor(5);
-}
+const highlightColor = [255, 255, 255, 50];
 
 export default class IoTMap extends React.Component {
+
+    constructor() {
+        super();
+        this._onEnter = this._onEnter.bind(this);
+        this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
+        this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
+        this.state = { map: undefined, selectedEntities: []};
+    }
+
+    _onEnter(event) {
+        const indoorMapEntityInformation = new window.L.Wrld.indoorMapEntities.indoorMapEntityInformation(event.indoorMap.getIndoorMapId());
+        indoorMapEntityInformation.addTo(this.state.map);
+        this.setState({ entityInfo: indoorMapEntityInformation });
+        event.target.setFloor(5);
+    }
+
+    _resolveIndoorMapEntity(entities, id) {
+        return entities.filter((entity) => entity.getIndoorMapEntityId() === id)[0];
+    }
+
+    _indoorEntityClicked(event) {
+        const entity = this._resolveIndoorMapEntity(this.state.entityInfo.getIndoorMapEntities(), event.ids[0]);
+        const indoors = event.target;
+        // Clear first, only one entity can be active at any given time
+        indoors.clearEntityHighlights(this.state.selectedEntities);
+        indoors.setEntityHighlights(event.ids, highlightColor);
+        this.setState({ selectedEntities: event.ids });
+
+        var popup = window.L.popup({ elevation: 170 })
+            .setLatLng(entity.getPosition())
+            .setContent('<p>Hello world!<br />This is a nice popup.</p>')
+            .openOn(this.state.map);
+
+        this.setState({ activePopup: popup });
+    }
 
     componentDidMount() {
         var map = window.L.Wrld.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
@@ -16,20 +45,13 @@ export default class IoTMap extends React.Component {
             zoom: 15,
             indoorsEnabled: true,
         });
-        map.indoors.on("indoormapenter", onEnter);
+        map.indoors.on("indoormapenter", this._onEnter);
+        map.indoors.on('indoorentityclick', this._indoorEntityClicked);
 
         // save map and layer references to local state
         this.setState({
             map: map
         });
-
-        window.L.marker([60.190975, 24.949280], {
-            title: "This is indoors!",
-            indoorMapId: "EIM-dbc3c842-5303-4ec5-989e-db20bc18bc58",
-            indoorMapFloorId: 5,
-            elevation: 2
-          }).addTo(map);
-
     }
 
     componentDidUpdate(prevProps, prevState) {
