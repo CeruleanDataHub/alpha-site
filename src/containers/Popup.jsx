@@ -11,8 +11,8 @@ export default class Popup extends React.Component {
         const socket = io("https://iot-platform-api-test.azurewebsites.net");
 
         socket.on("sensorData", data => {
-            if( data.reqJson ){
-                this.setState({sensorData: data.reqJson})
+            if( data.data ){
+                this.setState({sensorData: data.data})
             }
         });
     }
