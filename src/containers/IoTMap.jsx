@@ -1,4 +1,5 @@
 import React from 'react';
+import Popup from './Popup';
 
 const highlightColor = [255, 255, 255, 50];
 
@@ -9,7 +10,8 @@ export default class IoTMap extends React.Component {
         this._onEnter = this._onEnter.bind(this);
         this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
         this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
-        this.state = { map: undefined, selectedEntities: []};
+        this.state = { map: undefined, selectedEntities: [], showTelemetry: false};
+        this.handlePopupClose = this.handlePopupClose.bind(this);
     }
 
     _onEnter(event) {
@@ -31,12 +33,14 @@ export default class IoTMap extends React.Component {
         indoors.setEntityHighlights(event.ids, highlightColor);
         this.setState({ selectedEntities: event.ids });
 
-        var popup = window.L.popup({ elevation: 170 })
-            .setLatLng(entity.getPosition())
-            .setContent('<p>Hello world!<br />This is a nice popup.</p>')
-            .openOn(this.state.map);
+        this.setState({showTelemetry: true})
 
-        this.setState({ activePopup: popup });
+        // var popup = window.L.popup({ elevation: 170 })
+        //     .setLatLng(entity.getPosition())
+        //     .setContent('<p>Hello world!<br />This is a nice popup.</p>')
+        //     .openOn(this.state.map);
+
+        // this.setState({ activePopup: popup });
     }
 
     componentDidMount() {
@@ -62,9 +66,18 @@ export default class IoTMap extends React.Component {
         );*/
     }
 
+    handlePopupClose() {
+        this.setState({showTelemetry: false})
+    }
+
     render() {
         return (
-            <div id="map" ref="mapContainer"></div>
+            <>
+                <div id="map" ref="mapContainer"></div>
+                {this.state.showTelemetry && (
+                    <Popup handlePopupClose={this.handlePopupClose}/>
+                )}
+            </>
         );
     }
 }
