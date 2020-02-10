@@ -1,6 +1,15 @@
 import React from "react";
 import io from "socket.io-client";
 
+
+const isDataAvailable = (data) => {
+    return (
+        data
+        && data.temperature
+        && data.humidity
+        && data.pressure
+    );
+}
 export default class Popup extends React.Component {
     constructor() {
         super();
@@ -34,13 +43,13 @@ export default class Popup extends React.Component {
                 }}
                 onClick={() => this.props.handlePopupClose()}
             >
-                {this.state.sensorData ? (
+                {isDataAvailable(this.state.sensorData) ? (
                     <div>
                         Temperature: {this.state.sensorData.temperature.toFixed(2)} <br />
                         Humidity: {this.state.sensorData.humidity.toFixed(2)} <br />
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
                     </div>
-                ): <div>Loading...</div>}
+                ) : <div>Loading...</div>}
                 <br />
             </div>
         );
