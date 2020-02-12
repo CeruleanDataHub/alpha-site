@@ -1,6 +1,30 @@
 import React from "react";
+import styled, { css } from 'styled-components';
 import io from "socket.io-client";
 
+const PopupContainer = styled.div`
+    position: absolute;
+    top: ${props => props.y}px;
+    left: ${props => props.x}px;
+    transition: all 280ms ease-in-out;
+    width: 0;
+    height: 0;
+    background-color: white;
+    border-radius: 3px;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 0 0 0px rgba(0,0,0,0);
+    overflow: hidden;
+    ${props => props.animate && css`
+        width: 40em;
+        height: 25em;
+        margin-left: -20em;
+        margin-top: -12.5em;
+        box-shadow: 0 0 0 10px rgba(0,0,0,0.25);
+    `};
+`;
+
+const PopupLayer = styled.div``;
 
 const isDataAvailable = (data) => {
     return (
@@ -13,7 +37,15 @@ const isDataAvailable = (data) => {
 export default class Popup extends React.Component {
     constructor() {
         super();
-        this.state = {sensorData: null}
+        this.state = { sensorData: null, animate: false };
+        this._handleClose = this._handleClose.bind(this);
+    }
+
+    _handleClose() {
+        this.setState({ animate: false });
+        setTimeout(() => {
+            this.props.handlePopupClose()
+        }, 280);
     }
 
     componentDidMount() {
@@ -24,34 +56,27 @@ export default class Popup extends React.Component {
                 this.setState({sensorData: data.data})
             }
         });
+        setTimeout(() => {
+            this.setState({ animate: true });
+        }, 100);
     }
 
     render() {
         return (
-            <div
-                style={{
-                    backgroundColor: "#fff",
-                    height: "100px",
-                    width: "200px",
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    marginTop: "-55px",
-                    marginLeft: "-105px",
-                    padding: "10px",
-                    border: "2px solid"
-                }}
-                onClick={() => this.props.handlePopupClose()}
+            <PopupContainer
+                animate={ this.state.animate }
+                x={ this.props.entityCoordinates.x }
+                y={ this.props.entityCoordinates.y }
+                onClick={ this._handleClose }
             >
                 {isDataAvailable(this.state.sensorData) ? (
-                    <div>
+                    <PopupLayer>
                         Temperature: {this.state.sensorData.temperature.toFixed(2)} <br />
                         Humidity: {this.state.sensorData.humidity.toFixed(2)} <br />
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
-                    </div>
+                    </PopupLayer>
                 ) : <div>Loading...</div>}
-                <br />
-            </div>
+            </PopupContainer>
         );
     }
 }
