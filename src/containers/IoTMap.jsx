@@ -1,4 +1,6 @@
 import React from 'react';
+import Wrld from 'wrld.js';
+
 import Popup from './Popup';
 
 const highlightColor = [255, 255, 255, 50];
@@ -7,26 +9,23 @@ export default class IoTMap extends React.Component {
 
     constructor() {
         super();
-        this._onEnter = this._onEnter.bind(this);
-        this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
-        this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
-        this.state = { map: undefined, selectedEntityIds: [], showTelemetry: false };
-        this.handlePopupClose = this.handlePopupClose.bind(this);
+        this.state = { map: undefined, selectedEntityIds: [], showTelemetry: false, entityCoordinates: undefined, entityInfo: [] };
+
     }
 
-    _onEnter(event) {
-        const indoorMapEntityInformation = new window.L.Wrld.indoorMapEntities.indoorMapEntityInformation(event.indoorMap.getIndoorMapId());
+    onEnter = (event) => {
+        const indoorMapEntityInformation = new Wrld.indoorMapEntities.indoorMapEntityInformation(event.indoorMap.getIndoorMapId());
         indoorMapEntityInformation.addTo(this.state.map);
         this.setState({ entityInfo: indoorMapEntityInformation });
         event.target.setFloor(5);
     }
 
-    _resolveIndoorMapEntity(entities, id) {
+    resolveIndoorMapEntity = (entities, id) => {
         return entities.filter((entity) => entity.getIndoorMapEntityId() === id)[0];
     }
 
-    _indoorEntityClicked(event) {
-        const entity = this._resolveIndoorMapEntity(this.state.entityInfo.getIndoorMapEntities(), event.ids[0]);
+    indoorEntityClicked = (event) => {
+        const entity = this.resolveIndoorMapEntity(this.state.entityInfo.getIndoorMapEntities(), event.ids[0]);
         const indoors = event.target;
         const entityPosition = entity.getPosition();
         const elevatedPosition = window.L.latLng(entityPosition.lat, entityPosition.lng, 35);
@@ -39,14 +38,24 @@ export default class IoTMap extends React.Component {
         this.setState({ showTelemetry: true });
     }
 
+    handlePopupClose = () => {
+        this.setState({showTelemetry: false})
+    }
+
+    removeLeafletControlContainer = () => {
+        var leafletControlContainer =  document.querySelector('.leaflet-bottom.leaflet-right');
+        leafletControlContainer.parentElement.removeChild(leafletControlContainer);
+    }
+
     componentDidMount() {
-        var map = window.L.Wrld.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
+        var map = Wrld.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
             center: [60.19109,24.94946],
             zoom: 15,
             indoorsEnabled: true
         });
-        map.indoors.on("indoormapenter", this._onEnter);
-        map.indoors.on('indoorentityclick', this._indoorEntityClicked);
+        map.on("initialstreamingcomplete", this.removeLeafletControlContainer);
+        map.indoors.on("indoormapenter", this.onEnter);
+        map.indoors.on('indoorentityclick', this.indoorEntityClicked);
 
         // save map and layer references to local state
         this.setState({
@@ -54,9 +63,6 @@ export default class IoTMap extends React.Component {
         });
     }
 
-    handlePopupClose() {
-        this.setState({showTelemetry: false})
-    }
 
     render() {
         return (

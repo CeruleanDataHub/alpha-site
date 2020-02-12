@@ -38,10 +38,9 @@ export default class Popup extends React.Component {
     constructor() {
         super();
         this.state = { sensorData: null, animate: false };
-        this._handleClose = this._handleClose.bind(this);
     }
 
-    _handleClose() {
+    handleClose = () => {
         this.setState({ animate: false });
         setTimeout(() => {
             this.props.handlePopupClose()
@@ -67,7 +66,7 @@ export default class Popup extends React.Component {
                 animate={ this.state.animate }
                 x={ this.props.entityCoordinates.x }
                 y={ this.props.entityCoordinates.y }
-                onClick={ this._handleClose }
+                onClick={ this.handleClose }
             >
                 {isDataAvailable(this.state.sensorData) ? (
                     <PopupLayer>
