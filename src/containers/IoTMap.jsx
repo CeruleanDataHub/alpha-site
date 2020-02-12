@@ -35,7 +35,6 @@ export default class IoTMap extends React.Component {
         indoors.clearEntityHighlights(this.state.selectedEntityIds);
         indoors.setEntityHighlights(event.ids, highlightColor);
         this.setState({ selectedEntityIds: event.ids });
-        this.setState({ entity: entity });
         this.setState({ entityCoordinates: this.state.map.latLngToLayerPoint(elevatedPosition) });
         this.setState({ showTelemetry: true });
     }
@@ -53,15 +52,6 @@ export default class IoTMap extends React.Component {
         this.setState({
             map: map
         });
-        window.myMap = map;
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        /*this.state.featuresLayer.setSource(
-            new window.ol.source.Vector({
-                features: this.props.routes
-            })
-        );*/
     }
 
     handlePopupClose() {
@@ -74,7 +64,6 @@ export default class IoTMap extends React.Component {
                 <div id="map" ref="mapContainer"></div>
                 {this.state.showTelemetry && (
                     <Popup
-                        entity={ this.state.entity }
                         entityCoordinates={ this.state.entityCoordinates }
                         handlePopupClose={ this.handlePopupClose }
                     />
