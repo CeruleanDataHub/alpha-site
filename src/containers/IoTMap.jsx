@@ -10,7 +10,7 @@ export default class IoTMap extends React.Component {
         this._onEnter = this._onEnter.bind(this);
         this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
         this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
-        this.state = { map: undefined, selectedEntities: [], showTelemetry: false};
+        this.state = { map: undefined, selectedEntityIds: [], showTelemetry: false };
         this.handlePopupClose = this.handlePopupClose.bind(this);
     }
 
