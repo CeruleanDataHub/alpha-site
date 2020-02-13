@@ -1,6 +1,8 @@
 import React from "react";
 import styled, { css } from 'styled-components';
 import io from "socket.io-client";
+import ConditionTabs from './ConditionTabs.jsx';
+
 
 const PopupContainer = styled.div`
     position: absolute;
@@ -69,13 +71,14 @@ export default class Popup extends React.Component {
                 y={ this.props.entityCoordinates.y }
                 onClick={ this._handleClose }
             >
-                {isDataAvailable(this.state.sensorData) ? (
+                {/*isDataAvailable(this.state.sensorData) ? (
                     <PopupLayer>
                         Temperature: {this.state.sensorData.temperature.toFixed(2)} <br />
                         Humidity: {this.state.sensorData.humidity.toFixed(2)} <br />
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
                     </PopupLayer>
-                ) : <div>Loading...</div>}
+                ) : <div>Loading...</div>*/}
+                <ConditionTabs />
             </PopupContainer>
         );
     }
