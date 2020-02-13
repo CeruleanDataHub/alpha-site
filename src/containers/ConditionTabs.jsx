@@ -41,6 +41,11 @@ const RealtimeValue = styled.li`
     }
 `;
 
+
+const TEMPERATURE_PLACEHOLDER="+24,7";
+const HUMIDITY_PLACEHOLDER="33,4";
+const PRESSURE_PLACEHOLDER="1024";
+
 export default class ConditionTabs extends React.Component {
     constructor() {
         super();
@@ -60,9 +65,15 @@ export default class ConditionTabs extends React.Component {
         return (
             <ConditionTabsContainer>
                 <RealtimeContainer>
-                    <RealtimeValue type={ temperature } name="Temperature">+24,7 °C</RealtimeValue>
-                    <RealtimeValue type={ humidity } name="Humidity">33,4%</RealtimeValue>
-                    <RealtimeValue type={ pressure } name="Pressure">1024 HPa</RealtimeValue>
+                    <RealtimeValue type={ temperature } name="Temperature">
+                        { this.props.data && this.props.data.temperature ? this.props.data.temperature.toFixed(2) : TEMPERATURE_PLACEHOLDER } °C
+                    </RealtimeValue>
+                    <RealtimeValue type={ humidity } name="Humidity">
+                        { this.props.data && this.props.data.humidity ? this.props.data.humidity.toFixed(2) : HUMIDITY_PLACEHOLDER } %
+                    </RealtimeValue>
+                    <RealtimeValue type={ pressure } name="Pressure">
+                        { this.props.data && this.props.data.pressure ? this.props.data.pressure.toFixed(2) : PRESSURE_PLACEHOLDER }HPa
+                    </RealtimeValue>
                 </RealtimeContainer>
                 <Chart />
             </ConditionTabsContainer>

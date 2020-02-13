@@ -78,7 +78,7 @@ export default class Popup extends React.Component {
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
                     </PopupLayer>
                 ) : <div>Loading...</div>*/}
-                <ConditionTabs />
+                <ConditionTabs data={this.state.sensorData} />
             </PopupContainer>
         );
     }
