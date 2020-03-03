@@ -4,6 +4,8 @@ import temperature from './assets/icons/temperature.svg';
 import humidity from './assets/icons/humidity.svg';
 import pressure from './assets/icons/pressure.svg';
 import Chart from './Chart.jsx';
+import Icon, { ICONS } from './Icon.jsx';
+
 
 const ConditionTabsContainer = styled.div``;
 const RealtimeContainer = styled.ul`
@@ -65,13 +67,16 @@ export default class ConditionTabs extends React.Component {
         return (
             <ConditionTabsContainer>
                 <RealtimeContainer>
-                    <RealtimeValue type={ temperature } name="Temperature">
+                    <RealtimeValue name="Temperature">
+                        <Icon type={ ICONS.temperature } />
                         { this.props.data && this.props.data.temperature ? this.props.data.temperature.toFixed(2) : TEMPERATURE_PLACEHOLDER } °C
                     </RealtimeValue>
-                    <RealtimeValue type={ humidity } name="Humidity">
+                    <RealtimeValue name="Humidity">
+                        <Icon type={ ICONS.humidity } />
                         { this.props.data && this.props.data.humidity ? this.props.data.humidity.toFixed(2) : HUMIDITY_PLACEHOLDER } %
                     </RealtimeValue>
-                    <RealtimeValue type={ pressure } name="Pressure">
+                    <RealtimeValue name="Pressure">
+                        <Icon type={ ICONS.pressure } />
                         { this.props.data && this.props.data.pressure ? this.props.data.pressure.toFixed(2) : PRESSURE_PLACEHOLDER }HPa
                     </RealtimeValue>
                 </RealtimeContainer>
