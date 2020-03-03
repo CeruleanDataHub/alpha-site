@@ -4,7 +4,7 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import moment from "moment-timezone";
 
-export default class Chart extends Component {
+export default class PressureChart extends Component {
     constructor(props) {
         super(props);
         const { timeLabels, data } = this.timelineData(moment().tz('Europe/Helsinki').format('HH:mm'), 10, 'minutes');
@@ -12,8 +12,9 @@ export default class Chart extends Component {
             // To avoid unnecessary update keep all options in the state.
             chartOptions: {
                 chart: {
-                    width: 620,
-                    height: 280
+                    width: 625,
+                    height: 299,
+                    backgroundColor: '#eeeeee'
                 },
                 title: null,
                 xAxis: {
@@ -48,7 +49,7 @@ export default class Chart extends Component {
         for (let i = 0; i <= periodsInADay; i += interval) {
           startTimeMoment.add(i === 0 ? 0 : interval, period);
           timeLabels.push(startTimeMoment.tz('Europe/Helsinki').format('D.M.Y HH:mm'));
-          data.push(parseFloat(Number((Math.random() * 3) + 20).toFixed(2)));
+          data.push(parseInt(Number((Math.random() * 30) + 980)));
         }
 
         return { timeLabels, data };
