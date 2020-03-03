@@ -23,7 +23,7 @@ export default class PressureChart extends Component {
                 yAxis: {
                     title: { enabled: false }
                 },
-                series: [{ data }],
+                series: [{ name: 'Pressure', data }],
                 plotOptions: {
                     series: {
                         point: {

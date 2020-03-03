@@ -4,7 +4,7 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import moment from "moment-timezone";
 
-export default class Chart extends Component {
+export default class TemperatureChart extends Component {
     constructor(props) {
         super(props);
         const { timeLabels, data } = this.timelineData(moment().tz('Europe/Helsinki').format('HH:mm'), 10, 'minutes');
@@ -23,7 +23,7 @@ export default class Chart extends Component {
                 yAxis: {
                     title: { enabled: false }
                 },
-                series: [{ data }],
+                series: [{ name: 'Temperature', data }],
                 plotOptions: {
                     series: {
                         point: {

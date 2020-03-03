@@ -23,7 +23,7 @@ export default class HumidityChart extends Component {
                 yAxis: {
                     title: { enabled: false }
                 },
-                series: [{ data }],
+                series: [{ name: 'Humidity', data }],
                 plotOptions: {
                     series: {
                         point: {
