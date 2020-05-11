@@ -1,0 +1,25 @@
+.home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.home-btns {
+    display: flex;
+    flex-direction: row;
+}
+
+.home-btns > *,
+.login-btn {
+    margin: 0 20px;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 10%;
+    cursor: pointer;
+    background-color: beige;
+}
+
+a {
+    text-decoration: none;
+}
