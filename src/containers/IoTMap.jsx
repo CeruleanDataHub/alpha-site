@@ -51,7 +51,12 @@ export default class IoTMap extends React.Component {
         var map = Wrld.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
             center: [60.19109,24.94946],
             zoom: 15,
-            indoorsEnabled: true
+            indoorsEnabled: true,
+            //Reduce CPU Usage
+            trafficEnabled: false,
+            frameRateThrottleWhenIdleEnabled: true,
+            throttledTargetFrameIntervalMilliseconds: 500,
+            idleSecondsBeforeFrameRateThrottle: 15.0
         });
         map.on("initialstreamingcomplete", this.removeLeafletControlContainer);
         map.indoors.on("indoormapenter", this.onEnter);
