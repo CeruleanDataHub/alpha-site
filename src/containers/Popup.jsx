@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 import io from "socket.io-client";
 import ConditionTabs from './ConditionTabs.jsx';
 
-
 const PopupContainer = styled.div`
     position: absolute;
     top: ${props => props.y}px;
@@ -13,7 +12,7 @@ const PopupContainer = styled.div`
     height: 0;
     background-color: white;
     border-radius: 3px;
-    padding: 10px;
+    padding: 0;
     box-sizing: border-box;
     box-shadow: 0 0 0 0px rgba(0,0,0,0);
     overflow: hidden;
@@ -24,6 +23,18 @@ const PopupContainer = styled.div`
         margin-top: -12.5em;
         box-shadow: 0 0 0 10px rgba(0,0,0,0.25);
     `};
+`;
+
+const PopupClose = styled.div`
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+    line-height: 1em;
+    z-index: 1;
+    cursor: pointer;
 `;
 
 const PopupLayer = styled.div``;
@@ -69,8 +80,8 @@ export default class Popup extends React.Component {
                 animate={ this.state.animate }
                 x={ this.props.entityCoordinates.x }
                 y={ this.props.entityCoordinates.y }
-                onClick={ this._handleClose }
             >
+                <PopupClose onClick={ this._handleClose }>X</PopupClose>
                 {/*isDataAvailable(this.state.sensorData) ? (
                     <PopupLayer>
                         Temperature: {this.state.sensorData.temperature.toFixed(2)} <br />
@@ -78,7 +89,7 @@ export default class Popup extends React.Component {
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
                     </PopupLayer>
                 ) : <div>Loading...</div>*/}
-                <ConditionTabs />
+                <ConditionTabs data={this.state.sensorData} />
             </PopupContainer>
         );
     }
