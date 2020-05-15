@@ -10,10 +10,6 @@ import Home from "./containers/Home.jsx";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-import * as reduxMiddleware from "@denim/iot-platform-middleware-redux";
-
-console.log(reduxMiddleware);
-
 const onRedirectCallback = (appState) => {
     createBrowserHistory().push(
         appState && appState.targetUrl
@@ -25,7 +21,7 @@ const onRedirectCallback = (appState) => {
 ReactDOM.render(
     <Auth0Provider
         domain="denim-data-hub.eu.auth0.com"
-        client_id="OHGmZzsoKP0gM1stF0ckvkkm507FAPGq"
+        client_id="7PopqRiT4ILKyo4d9jeHRH0onqmd0kg1"
         audience="https://ddh-api.azure-api.net"
         redirect_uri={window.location.origin}
         onRedirectCallback={onRedirectCallback}

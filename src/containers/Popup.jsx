@@ -1,12 +1,12 @@
 import React from "react";
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 import io from "socket.io-client";
-import ConditionTabs from './ConditionTabs.jsx';
+import ConditionTabs from "./ConditionTabs.jsx";
 
 const PopupContainer = styled.div`
     position: absolute;
-    top: ${props => props.y}px;
-    left: ${props => props.x}px;
+    top: ${(props) => props.y}px;
+    left: ${(props) => props.x}px;
     transition: all 280ms ease-in-out;
     width: 0;
     height: 0;
@@ -14,15 +14,17 @@ const PopupContainer = styled.div`
     border-radius: 3px;
     padding: 0;
     box-sizing: border-box;
-    box-shadow: 0 0 0 0px rgba(0,0,0,0);
+    box-shadow: 0 0 0 0px rgba(0, 0, 0, 0);
     overflow: hidden;
-    ${props => props.animate && css`
-        width: 40em;
-        height: 25em;
-        margin-left: -20em;
-        margin-top: -12.5em;
-        box-shadow: 0 0 0 10px rgba(0,0,0,0.25);
-    `};
+    ${(props) =>
+        props.animate &&
+        css`
+            width: 40em;
+            height: 25em;
+            margin-left: -20em;
+            margin-top: -12.5em;
+            box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.25);
+        `};
 `;
 
 const PopupClose = styled.div`
@@ -40,48 +42,60 @@ const PopupClose = styled.div`
 const PopupLayer = styled.div``;
 
 const isDataAvailable = (data) => {
-    return (
-        data
-        && data.temperature
-        && data.humidity
-        && data.pressure
-    );
-}
+    return data && data.temperature && data.humidity && data.pressure;
+};
 export default class Popup extends React.Component {
     constructor() {
         super();
-        this.state = { sensorData: null, animate: false };
+        this.state = { animate: false, deviceData: null };
         this._handleClose = this._handleClose.bind(this);
     }
 
     _handleClose() {
         this.setState({ animate: false });
         setTimeout(() => {
-            this.props.handlePopupClose()
+            this.props.handlePopupClose();
         }, 280);
     }
 
     componentDidMount() {
-        const socket = io("https://iot-platform-api-test.azurewebsites.net");
+        const DB_API = "https://iot-platform-db-api.azurewebsites.net";
+        this.socket = io(DB_API);
 
-        socket.on("sensorData", data => {
-            if( data.data ){
-                this.setState({sensorData: data.data})
-            }
+        // rasp pi device id
+        this.data = {
+            deviceId: "fe:70:c2:91:f6:4e",
+        };
+        this.socket.on("connect", (_) => {
+            this.socket.emit("UPDATE_DEVICE_SELECTION", {
+                ...this.data,
+                prop: "ADD",
+            });
         });
+        this.socket.on("DEVICE_DATA", (deviceData) => {
+            this.setState({ deviceData });
+        });
+
         setTimeout(() => {
             this.setState({ animate: true });
         }, 100);
     }
 
+    componentWillUnmount() {
+        this.socket.emit("UPDATE_DEVICE_SELECTION", {
+            ...this.data,
+            prop: "REMOVE",
+        });
+        this.socket.close();
+    }
     render() {
         return (
             <PopupContainer
-                animate={ this.state.animate }
-                x={ this.props.entityCoordinates.x }
-                y={ this.props.entityCoordinates.y }
+                animate={this.state.animate}
+                x={this.props.entityCoordinates.x}
+                y={this.props.entityCoordinates.y}
             >
-                <PopupClose onClick={ this._handleClose }>X</PopupClose>
+                <PopupClose onClick={this._handleClose}>X</PopupClose>
                 {/*isDataAvailable(this.state.sensorData) ? (
                     <PopupLayer>
                         Temperature: {this.state.sensorData.temperature.toFixed(2)} <br />
@@ -89,7 +103,9 @@ export default class Popup extends React.Component {
                         Pressure: {this.state.sensorData.pressure.toFixed(2)} <br />
                     </PopupLayer>
                 ) : <div>Loading...</div>*/}
-                <ConditionTabs data={this.state.sensorData} />
+                {this.state.deviceData && (
+                    <ConditionTabs data={this.state.deviceData.telemetry} />
+                )}
             </PopupContainer>
         );
     }
