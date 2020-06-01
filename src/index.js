@@ -17,12 +17,13 @@ const onRedirectCallback = (appState) => {
             : window.location.pathname
     );
 };
+console.log(process.env.REACT_APP_AUTH0_DOMAIN);
 
 ReactDOM.render(
     <Auth0Provider
-        domain="denim-data-hub.eu.auth0.com"
-        client_id="7PopqRiT4ILKyo4d9jeHRH0onqmd0kg1"
-        audience="https://ddh-api.azure-api.net"
+        domain={process.env.REACT_APP_AUTH0_DOMAIN}
+        client_id={process.env.REACT_APP_AUTH0_CLIENT_ID}
+        audience={process.env.REACT_APP_AUTH0_AUDIENCE}
         redirect_uri={window.location.origin}
         onRedirectCallback={onRedirectCallback}
     >
