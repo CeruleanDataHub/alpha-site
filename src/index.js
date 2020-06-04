@@ -2,14 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
-
+import { Provider } from "react-redux";
 import { Auth0Provider } from "./auth0-spa.jsx";
+import { store } from "./store.jsx";
 import IoTMap from "./containers/IoTMap.jsx";
+import Home from "./containers/Home.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const onRedirectCallback = (appState) => {
     createBrowserHistory().push(
@@ -20,19 +22,21 @@ const onRedirectCallback = (appState) => {
 };
 
 ReactDOM.render(
-    <Auth0Provider
-        domain={process.env.REACT_APP_AUTH0_DOMAIN}
-        client_id={process.env.REACT_APP_AUTH0_CLIENT_ID}
-        audience={process.env.REACT_APP_AUTH0_AUDIENCE}
-        redirect_uri={window.location.origin}
-        onRedirectCallback={onRedirectCallback}
-    >
-        <Router>
-            <Switch>
-                <Route path="/" component={IoTMap} />
-            </Switch>
-        </Router>
-    </Auth0Provider>,
+    <Provider store={store}>
+        <Auth0Provider
+            domain={process.env.REACT_APP_AUTH0_DOMAIN}
+            client_id={process.env.REACT_APP_AUTH0_CLIENT_ID}
+            audience={process.env.REACT_APP_AUTH0_AUDIENCE}
+            redirect_uri={window.location.origin}
+            onRedirectCallback={onRedirectCallback}
+        >
+            <Router>
+                <Switch>
+                    <Route path="/" component={IoTMap} />
+                </Switch>
+            </Router>
+        </Auth0Provider>
+    </Provider>,
     document.getElementById("root")
 );
 

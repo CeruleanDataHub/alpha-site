@@ -1,5 +1,8 @@
 import React from "react";
-import styled from "styled-components";
+import { connect } from "react-redux";
+import styled, { css } from "styled-components";
+import { latestTelemetry } from "@denim/iot-platform-middleware-redux";
+
 import TemperatureChart from "./TemperatureChart.jsx";
 import HumidityChart from "./HumidityChart.jsx";
 import PressureChart from "./PressureChart.jsx";
@@ -69,7 +72,7 @@ const TEMPERATURE_PLACEHOLDER = "+24,7";
 const HUMIDITY_PLACEHOLDER = "33,4";
 const PRESSURE_PLACEHOLDER = "1024";
 
-export default class ConditionTabs extends React.Component {
+class ConditionTabs extends React.Component {
     constructor() {
         super();
         this.state = { activeTab: 1, fade: "in" };
@@ -89,6 +92,12 @@ export default class ConditionTabs extends React.Component {
     }
 
     componentDidMount() {
+        this.props.getLatestHourlyTelemetry({
+            table: "denim_telemetry.ruuvi_telemetry_hourly",
+            columns: ["avg_temperature", "avg_pressure", "avg_humidity"],
+            limit: 10,
+        });
+
         setTimeout(() => {
             this.setState({ animate: true });
         }, 100);
@@ -150,3 +159,9 @@ export default class ConditionTabs extends React.Component {
         );
     }
 }
+
+export default connect(null, (dispatch) => ({
+    getLatestHourlyTelemetry: (data) => {
+        return dispatch(latestTelemetry(data));
+    },
+}))(ConditionTabs);
