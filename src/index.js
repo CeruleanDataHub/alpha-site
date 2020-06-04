@@ -4,11 +4,12 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
 
 import { Auth0Provider } from "./auth0-spa.jsx";
-import IoTMapWrapper from "./containers/IoTMapWrapper.jsx";
-import Home from "./containers/Home.jsx";
+import IoTMap from "./containers/IoTMap.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+
+require('dotenv').config();
 
 const onRedirectCallback = (appState) => {
     createBrowserHistory().push(
@@ -17,7 +18,6 @@ const onRedirectCallback = (appState) => {
             : window.location.pathname
     );
 };
-console.log(process.env.REACT_APP_AUTH0_DOMAIN);
 
 ReactDOM.render(
     <Auth0Provider
@@ -29,8 +29,7 @@ ReactDOM.render(
     >
         <Router>
             <Switch>
-                <Route exact path="/map" component={IoTMapWrapper} />
-                <Route path="/" component={Home} />
+                <Route path="/" component={IoTMap} />
             </Switch>
         </Router>
     </Auth0Provider>,

@@ -40,6 +40,8 @@ export const Auth0Provider = ({
             if (isAuthenticated) {
                 const user = await auth0FromHook.getUser();
                 setUser(user);
+            } else {
+                auth0FromHook.loginWithRedirect({ returnTo: window.location.origin + "/" });
             }
 
             setLoading(false);
