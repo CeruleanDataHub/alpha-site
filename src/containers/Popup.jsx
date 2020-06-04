@@ -39,11 +39,6 @@ const PopupClose = styled.div`
     cursor: pointer;
 `;
 
-const PopupLayer = styled.div``;
-
-const isDataAvailable = (data) => {
-    return data && data.temperature && data.humidity && data.pressure;
-};
 export default class Popup extends React.Component {
     constructor() {
         super();

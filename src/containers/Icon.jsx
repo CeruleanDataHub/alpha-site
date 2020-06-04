@@ -1,9 +1,8 @@
 import React from "react";
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import temperature from './assets/icons/temperature.svg';
 import humidity from './assets/icons/humidity.svg';
 import pressure from './assets/icons/pressure.svg';
-
 
 export const ICONS = {
     temperature,

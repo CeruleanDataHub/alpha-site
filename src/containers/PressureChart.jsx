@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import moment from "moment-timezone";

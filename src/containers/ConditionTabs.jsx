@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import TemperatureChart from "./TemperatureChart.jsx";
 import HumidityChart from "./HumidityChart.jsx";
 import PressureChart from "./PressureChart.jsx";
