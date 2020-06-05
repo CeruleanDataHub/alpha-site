@@ -3,9 +3,7 @@ import { connect } from "react-redux";
 import styled, { css } from "styled-components";
 import { latestTelemetry } from "@denim/iot-platform-middleware-redux";
 
-import TemperatureChart from "./TemperatureChart.jsx";
-import HumidityChart from "./HumidityChart.jsx";
-import PressureChart from "./PressureChart.jsx";
+import { Chart } from "@denim/react-components";
 import Icon, { ICONS } from "./Icon.jsx";
 
 const ConditionTabsContainer = styled.div``;
@@ -105,13 +103,26 @@ class ConditionTabs extends React.Component {
 
     renderChart() {
         const { activeTab } = this.state;
+        const xAxis = [{ categories: this.props.times }];
+        const series = [];
         if (activeTab === 1) {
-            return <TemperatureChart />;
+            series.push({
+                name: "Temperature",
+                data: this.props.temperature,
+            });
         } else if (activeTab === 2) {
-            return <HumidityChart />;
+            series.push({
+                name: "Humidity",
+                data: this.props.humidity,
+            });
         } else if (activeTab === 3) {
-            return <PressureChart />;
+            series.push({
+                name: "Pressure",
+                data: this.props.pressure,
+            });
         }
+
+        return <Chart xAxis={xAxis} series={series} />;
     }
 
     render() {
@@ -160,8 +171,27 @@ class ConditionTabs extends React.Component {
     }
 }
 
-export default connect(null, (dispatch) => ({
-    getLatestHourlyTelemetry: (data) => {
-        return dispatch(latestTelemetry(data));
+export default connect(
+    (state) => {
+        const latest = state.telemetry.latest
+            ? [...state.telemetry.latest].reverse()
+            : [];
+        return {
+            temperature: latest.map(({ avg_temperature }) =>
+                Number(avg_temperature.toFixed(2))
+            ),
+            humidity: latest.map(({ avg_humidity }) =>
+                Number(avg_humidity.toFixed(2))
+            ),
+            pressure: latest.map(({ avg_pressure }) =>
+                Number(parseFloat(avg_pressure).toFixed(2))
+            ),
+            times: latest.map(({ time }) => time),
+        };
     },
-}))(ConditionTabs);
+    (dispatch) => ({
+        getLatestHourlyTelemetry: (data) => {
+            return dispatch(latestTelemetry(data));
+        },
+    })
+)(ConditionTabs);
