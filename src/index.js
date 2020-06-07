@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import { Auth0Provider } from "./auth0-spa.jsx";
 import { store } from "./store.jsx";
 import IoTMap from "./containers/IoTMap.jsx";
-import Home from "./containers/Home.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
