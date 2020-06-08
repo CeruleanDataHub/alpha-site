@@ -54,8 +54,7 @@ export default class Popup extends React.Component {
     }
 
     componentDidMount() {
-        const DB_API = "https://iot-platform-db-api.azurewebsites.net";
-        this.socket = io(DB_API);
+        this.socket = io(process.env.REACT_APP_TELEMETRY_WEBSOCKET_URL);
 
         // rasp pi device id
         this.data = {
