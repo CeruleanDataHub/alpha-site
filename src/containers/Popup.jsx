@@ -5,8 +5,8 @@ import ConditionTabs from "./ConditionTabs.jsx";
 
 const PopupContainer = styled.div`
     position: absolute;
-    top: ${(props) => props.y}px;
-    left: ${(props) => props.x}px;
+    top: 50%;
+    left: 50%;
     transition: all 280ms ease-in-out;
     width: 0;
     height: 0;
