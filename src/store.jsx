@@ -4,18 +4,20 @@ import denimMiddleware, {
     Auth0SessionProvider,
 } from "@denim/iot-platform-middleware-redux";
 
+require("dotenv").config();
+
 const settingsProvider = {
-    API_URL: "http://localhost:3000",
+    API_URL: process.env.REACT_APP_API_URL,
 };
 
 const cacheProvider = {};
 
 const sessionProvider = new Auth0SessionProvider();
-//sessionProvider.setTenant(envVar.AUTH0_TENANT);
+sessionProvider.setTenant(process.env.REACT_APP_AUTH0_TENANT);
 
-/*const setToken = token => {
+const setToken = token => {
   sessionProvider.setToken(token);
-};*/
+};
 
 const store = configureStore({
     reducer: {
@@ -26,4 +28,4 @@ const store = configureStore({
     ],
 });
 
-export { store };
+export { store, setToken };

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { latestTelemetry } from "@denim/iot-platform-middleware-redux";
 
 import { Chart } from "@denim/react-components";

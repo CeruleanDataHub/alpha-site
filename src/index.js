@@ -10,8 +10,6 @@ import IoTMap from "./containers/IoTMap.jsx";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-require("dotenv").config();
-
 const onRedirectCallback = (appState) => {
     createBrowserHistory().push(
         appState && appState.targetUrl

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import createAuth0Client from "@auth0/auth0-spa-js";
+import { setToken } from './store.jsx';
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -40,6 +41,8 @@ export const Auth0Provider = ({
             if (isAuthenticated) {
                 const user = await auth0FromHook.getUser();
                 setUser(user);
+                const token = await auth0FromHook.getTokenSilently();
+                setToken(token);
             } else {
                 auth0FromHook.loginWithRedirect({ returnTo: window.location.origin + "/" });
             }
