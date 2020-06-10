@@ -1,16 +1,22 @@
 import React from 'react';
 import Popup from './Popup';
+import { connect } from "react-redux";
+import { findHierarchies } from "@denim/iot-platform-middleware-redux";
 
 const highlightColor = [255, 255, 255, 50];
 
-export default class IoTMap extends React.Component {
+const ENTITY_TO_HIERARCHY = {
+    7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d",
+}
+
+class IoTMap extends React.Component {
 
     constructor() {
         super();
         this._onEnter = this._onEnter.bind(this);
         this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
         this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
-        this.state = { map: undefined, selectedEntityIds: [], showTelemetry: false };
+        this.state = { map: undefined, showTelemetry: false };
         this.handlePopupClose = this.handlePopupClose.bind(this);
     }
 
@@ -34,9 +40,22 @@ export default class IoTMap extends React.Component {
         // Clear first, only one entity can be active at any given time
         indoors.clearEntityHighlights(this.state.selectedEntityIds);
         indoors.setEntityHighlights(event.ids, highlightColor);
-        this.setState({ selectedEntityIds: event.ids });
         this.setState({ entityCoordinates: this.state.map.latLngToLayerPoint(elevatedPosition) });
-        this.setState({ showTelemetry: true });
+
+        const indoorMapEntityId = entity.getIndoorMapEntityId();
+        const hierarchyUUID = ENTITY_TO_HIERARCHY[indoorMapEntityId];
+        if (hierarchyUUID) {
+            this.props.getHierarchies({
+                select: [ "id" ],
+                where: { uuid: hierarchyUUID },
+                take: 1
+            }).then(() => {
+                this.setState({ showTelemetry: true });
+            });
+        } else {
+            console.error(`No hierarchy found for indoorMapEntity ${indoorMapEntityId}`);
+            this.setState({ showTelemetry: false })
+        }
     }
 
     componentDidMount() {
@@ -60,16 +79,16 @@ export default class IoTMap extends React.Component {
     }
 
     handlePopupClose() {
-        this.setState({showTelemetry: false})
+        this.setState({ showTelemetry: false })
     }
 
     render() {
         return (
             <div>
                 <div id="map" ref="mapContainer"></div>
-                {this.state.showTelemetry && (
+                { this.state.showTelemetry && this.props.hierarchy && (
                     <Popup
-                        entityCoordinates={ this.state.entityCoordinates }
+                        hierarchyId={ this.props.hierarchy.id }
                         handlePopupClose={ this.handlePopupClose }
                     />
                 )}
@@ -77,3 +96,16 @@ export default class IoTMap extends React.Component {
         );
     }
 }
+
+export default connect(
+    (state) => {
+        const hierarchies = state.hierarchy.hierarchies || [];
+        const hierarchy = hierarchies.length > 0 ? hierarchies[0] : null;
+        return { hierarchy };
+    },
+    (dispatch) => ({
+        getHierarchies: (query) => {
+            return dispatch(findHierarchies(query))
+        },
+    })
+)(IoTMap);

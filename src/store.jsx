@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import denimMiddleware, {
     telemetryReducer,
     Auth0SessionProvider,
+    devicesReducer,
+    hierarchyReducer,
 } from "@denim/iot-platform-middleware-redux";
 
 require("dotenv").config();
@@ -22,6 +24,8 @@ const setToken = token => {
 const store = configureStore({
     reducer: {
         telemetry: telemetryReducer,
+        device: devicesReducer,
+        hierarchy: hierarchyReducer
     },
     middleware: [
         ...denimMiddleware(settingsProvider, cacheProvider, sessionProvider),

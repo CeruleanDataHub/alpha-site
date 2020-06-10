@@ -66,9 +66,7 @@ const ChartFader = styled.div`
     opacity: ${(props) => (props.fade === "in" ? 1 : 0)};
 `;
 
-const TEMPERATURE_PLACEHOLDER = "+24,7";
-const HUMIDITY_PLACEHOLDER = "33,4";
-const PRESSURE_PLACEHOLDER = "1024";
+const REAL_TIME_VALUE_PLACEHOLDER = "-"
 
 class ConditionTabs extends React.Component {
     constructor() {
@@ -93,6 +91,7 @@ class ConditionTabs extends React.Component {
         this.props.getLatestHourlyTelemetry({
             table: "denim_telemetry.ruuvi_telemetry_hourly",
             columns: ["avg_temperature", "avg_pressure", "avg_humidity"],
+            deviceId: this.props.device.id,
             limit: 10,
         });
 
@@ -126,7 +125,7 @@ class ConditionTabs extends React.Component {
     }
 
     render() {
-        const { data } = this.props;
+        const data = this.props.data ? this.props.data.telemetry : null;
         const { activeTab, fade } = this.state;
         return (
             <ConditionTabsContainer>
@@ -138,7 +137,7 @@ class ConditionTabs extends React.Component {
                         <Icon type={ICONS.temperature} />
                         {data && data.temperature
                             ? data.temperature.toFixed(2)
-                            : TEMPERATURE_PLACEHOLDER}{" "}
+                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         °C
                     </RealtimeValue>
                     <RealtimeValue
@@ -148,7 +147,7 @@ class ConditionTabs extends React.Component {
                         <Icon type={ICONS.humidity} />
                         {data && data.humidity
                             ? data.humidity.toFixed(2)
-                            : HUMIDITY_PLACEHOLDER}{" "}
+                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         %
                     </RealtimeValue>
                     <RealtimeValue
@@ -158,7 +157,7 @@ class ConditionTabs extends React.Component {
                         <Icon type={ICONS.pressure} />
                         {data && data.pressure
                             ? data.pressure.toFixed(2) / 100
-                            : PRESSURE_PLACEHOLDER}{" "}
+                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         HPa
                     </RealtimeValue>
                 </RealtimeContainer>
