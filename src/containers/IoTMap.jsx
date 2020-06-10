@@ -7,6 +7,7 @@ const highlightColor = [255, 255, 255, 50];
 
 const ENTITY_TO_HIERARCHY = {
     7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d",
+    743: "6bea86bb-d6d6-4fbe-b55f-68c31536aad5",
 }
 
 class IoTMap extends React.Component {
