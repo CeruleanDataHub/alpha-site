@@ -1,7 +1,7 @@
 import React from 'react';
 import Popup from './Popup';
 import { connect } from "react-redux";
-import { findHierarchies } from "@denim/iot-platform-middleware-redux";
+import { findHierarchies, findDevices } from "@denim/iot-platform-middleware-redux";
 
 const highlightColor = [255, 255, 255, 50];
 
@@ -32,7 +32,7 @@ class IoTMap extends React.Component {
         return entities.filter((entity) => entity.getIndoorMapEntityId() === id)[0];
     }
 
-    _indoorEntityClicked(event) {
+    async _indoorEntityClicked(event) {
         const entity = this._resolveIndoorMapEntity(this.state.entityInfo.getIndoorMapEntities(), event.ids[0]);
         const indoors = event.target;
         const entityPosition = entity.getPosition();
@@ -45,18 +45,38 @@ class IoTMap extends React.Component {
 
         const indoorMapEntityId = entity.getIndoorMapEntityId();
         const hierarchyUUID = ENTITY_TO_HIERARCHY[indoorMapEntityId];
-        if (hierarchyUUID) {
-            this.props.getHierarchies({
-                select: [ "id" ],
-                where: { uuid: hierarchyUUID },
-                take: 1
-            }).then(() => {
-                this.setState({ showTelemetry: true });
-            });
-        } else {
+
+        if (!hierarchyUUID) {
             console.error(`No hierarchy found for indoorMapEntity ${indoorMapEntityId}`);
-            this.setState({ showTelemetry: false })
+            this.setState({ showTelemetry: false });
+            return;
         }
+
+        await this.props.getHierarchies({
+            select: [ "id" ],
+            where: { uuid: hierarchyUUID },
+            take: 1
+        });
+
+        if (!this.props.hierarchy) {
+            console.log(`No hierarchy found with UUID ${hierarchyUUID}`);
+            this.setState({ showTelemetry: false });
+            return;
+        }
+
+        await this.props.getDevices({
+            select: [ "id", "external_id" ],
+            where: { hierarchy_id: this.props.hierarchy.id },
+            take: 1
+        });
+        
+        if (!this.props.device) {
+            console.log(`No device found with hierarchy_id ${this.props.hierarchy.id}`);
+            this.setState({ showTelemetry: false });
+            return;
+        }
+
+        this.setState({ showTelemetry: true });
     }
 
     componentDidMount() {
@@ -87,9 +107,9 @@ class IoTMap extends React.Component {
         return (
             <div>
                 <div id="map" ref="mapContainer"></div>
-                { this.state.showTelemetry && this.props.hierarchy && (
+                { this.state.showTelemetry && this.props.device && (
                     <Popup
-                        hierarchyId={ this.props.hierarchy.id }
+                        device={ this.props.device }
                         handlePopupClose={ this.handlePopupClose }
                     />
                 )}
@@ -102,11 +122,19 @@ export default connect(
     (state) => {
         const hierarchies = state.hierarchy.hierarchies || [];
         const hierarchy = hierarchies.length > 0 ? hierarchies[0] : null;
-        return { hierarchy };
+        const devices = state.device.devices || [];
+        const device = devices.length > 0 ? devices[0] : null;
+        return { 
+            hierarchy,
+            device
+        };
     },
     (dispatch) => ({
         getHierarchies: (query) => {
             return dispatch(findHierarchies(query))
+        },
+        getDevices: (query) => {
+            return dispatch(findDevices(query));
         },
     })
 )(IoTMap);

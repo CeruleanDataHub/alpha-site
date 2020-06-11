@@ -2,8 +2,6 @@ import React from "react";
 import styled, { css } from "styled-components";
 import io from "socket.io-client";
 import ConditionTabs from "./ConditionTabs.jsx";
-import { findDevices } from "@denim/iot-platform-middleware-redux";
-import { connect } from "react-redux";
 
 const PopupContainer = styled.div`
     position: absolute;
@@ -41,15 +39,7 @@ const PopupClose = styled.div`
     cursor: pointer;
 `;
 
-const Message = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    font-weight: bold;
-`;
-
-class Popup extends React.Component {
+export default class Popup extends React.Component {
     constructor() {
         super();
         this.state = { animate: false, deviceData: null, device: null };
@@ -64,31 +54,20 @@ class Popup extends React.Component {
     }
 
     componentDidMount() {
+        this.socket = io(process.env.REACT_APP_TELEMETRY_WEBSOCKET_URL);
 
-        const deviceQuery = {
-            select: [ "external_id" ],
-            where: { hierarchy_id: this.props.hierarchyId },
-            take: 1
-        }
+        const data = {
+            deviceId: this.props.device.external_id,
+        };
 
-        this.props.getDevices(deviceQuery).then(() => {
-            if (this.props.device) {
-                this.socket = io(process.env.REACT_APP_TELEMETRY_WEBSOCKET_URL);
-
-                const data = {
-                    deviceId: this.props.device.external_id,
-                };
-
-                this.socket.on("connect", (_) => {
-                    this.socket.emit("UPDATE_DEVICE_SELECTION", {
-                        ...data,
-                        prop: "ADD",
-                    });
-                });
-                this.socket.on("DEVICE_DATA", (deviceData) => {
-                    this.setState({ deviceData });
-                });
-            }
+        this.socket.on("connect", (_) => {
+            this.socket.emit("UPDATE_DEVICE_SELECTION", {
+                ...data,
+                prop: "ADD",
+            });
+        });
+        this.socket.on("DEVICE_DATA", (deviceData) => {
+            this.setState({ deviceData });
         });
 
         setTimeout(() => {
@@ -110,28 +89,8 @@ class Popup extends React.Component {
         return (
             <PopupContainer animate={this.state.animate}>
                 <PopupClose onClick={this._handleClose}>X</PopupClose>
-                { this.props.device &&
-                    <ConditionTabs data={this.state.deviceData} device={this.props.device} />
-                }
-                { !this.props.device &&
-                    <Message>No data</Message>
-                }
+                <ConditionTabs data={this.state.deviceData} device={this.props.device} />
             </PopupContainer>
         );
     }
 }
-
-export default connect(
-    (state) => {
-        const devices = state.device.devices || [];
-        const device = devices.length > 0 ? devices[0] : null;
-        return {
-            device
-        };
-    },
-    (dispatch) => ({
-        getDevices: (query) => {
-            return dispatch(findDevices(query));
-        },
-    })
-)(Popup);
