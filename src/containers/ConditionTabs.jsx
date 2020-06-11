@@ -71,7 +71,7 @@ const REAL_TIME_VALUE_PLACEHOLDER = "-"
 class ConditionTabs extends React.Component {
     constructor() {
         super();
-        this.state = { activeTab: 1, fade: "in" };
+        this.state = { activeTab: 1, fade: "in", showChart: false };
         this._handleTabChange = this._handleTabChange.bind(this);
     }
 
@@ -93,11 +93,9 @@ class ConditionTabs extends React.Component {
             columns: ["avg_temperature", "avg_pressure", "avg_humidity"],
             deviceId: this.props.device.id,
             limit: 10,
+        }).then(() => {
+            this.setState({ showChart: true })
         });
-
-        setTimeout(() => {
-            this.setState({ animate: true });
-        }, 100);
     }
 
     renderChart() {
@@ -162,9 +160,11 @@ class ConditionTabs extends React.Component {
                     </RealtimeValue>
                 </RealtimeContainer>
                 <ActiveTabIndicator activeTab={activeTab} />
-                <ChartContainer>
-                    <ChartFader fade={fade}>{this.renderChart()}</ChartFader>
-                </ChartContainer>
+                { this.state.showChart &&
+                    <ChartContainer>
+                        <ChartFader fade={fade}>{this.renderChart()}</ChartFader>
+                    </ChartContainer>
+                }
             </ConditionTabsContainer>
         );
     }
