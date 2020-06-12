@@ -118,8 +118,7 @@ class ConditionTabs extends React.Component {
                 data: this.props.pressure,
             });
         }
-
-        return <Chart xAxis={xAxis} series={series} />;
+        return <Chart key={activeTab} xAxis={xAxis} series={series} />;
     }
 
     render() {
