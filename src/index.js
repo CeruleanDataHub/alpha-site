@@ -1,37 +1,44 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { Provider } from "react-redux";
-import { Auth0Provider } from "./auth0-spa.jsx";
+import {
+    Auth0Provider,
+    withAuthenticationRequired,
+    useAuth0,
+} from "@auth0/auth0-react";
 import { store } from "./store.jsx";
 import IoTMap from "./containers/IoTMap.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-const onRedirectCallback = (appState) => {
-    createBrowserHistory().push(
-        appState && appState.targetUrl
-            ? appState.targetUrl
-            : window.location.pathname
-    );
-};
+export const history = createBrowserHistory();
 
+const ProtectedRoute = ({ component, ...args }) => (
+    <Route component={withAuthenticationRequired(component)} {...args} />
+);
+
+const onRedirectCallback = (appState) => {
+    history.replace(appState?.returnTo || window.location.pathname);
+};
 ReactDOM.render(
     <Provider store={store}>
         <Auth0Provider
             domain={process.env.REACT_APP_AUTH0_DOMAIN}
-            client_id={process.env.REACT_APP_AUTH0_CLIENT_ID}
-            audience={process.env.REACT_APP_AUTH0_AUDIENCE}
-            redirect_uri={window.location.origin}
+            clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
+            redirectUri={window.location.origin}
             onRedirectCallback={onRedirectCallback}
         >
-            <Router>
-                <Switch>
-                    <Route path="/" component={IoTMap} />
-                </Switch>
-            </Router>
+            {
+                <Router history={history}>
+                    <Switch>
+                        <ProtectedRoute path="/" component={IoTMap} />
+                    </Switch>
+                </Router>
+            }
         </Auth0Provider>
     </Provider>,
     document.getElementById("root")
