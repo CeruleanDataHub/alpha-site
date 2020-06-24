@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import { latestTelemetry } from "@denim/iot-platform-middleware-redux";
+import { aggregateTelemetryQuery } from "@ceruleandatahub/middleware-redux";
 
-import { Chart } from "@denim/react-components";
+import { Chart } from "@ceruleandatahub/react-components";
 import Icon, { ICONS } from "./Icon.jsx";
 
 const ConditionTabsContainer = styled.div``;
@@ -68,16 +68,21 @@ const ChartFader = styled.div`
 
 const REAL_TIME_VALUE_PLACEHOLDER = "-"
 
+const TABS = {
+    temperature: 1,
+    humidity: 2,
+    pressure: 3
+}
+
 class ConditionTabs extends React.Component {
     constructor() {
         super();
-        this.state = { activeTab: 1, fade: "in", showChart: false };
+        this.state = { activeTab: TABS.temperature, fade: "in", showChart: false };
         this._handleTabChange = this._handleTabChange.bind(this);
     }
 
     _handleTabChange(index) {
         return function () {
-            this.setState({ fade: "out" });
             setTimeout(() => {
                 this.setState({ activeTab: index });
                 setTimeout(() => {
@@ -88,34 +93,67 @@ class ConditionTabs extends React.Component {
     }
 
     componentDidMount() {
+        this.initData("temperature", () => { this.setState({
+            ["tab" + TABS.temperature + "Ready"]: true
+        })});
+        this.initData("humidity", () => { this.setState({
+            ["tab" + TABS.humidity + "Ready"]: true
+        })});
+        this.initData("pressure", () => { this.setState({
+            ["tab" + TABS.pressure + "Ready"]: true
+        })});
+    }
+
+    initData(sensorName, callback) {
         this.props.getLatestHourlyTelemetry({
-            table: "denim_telemetry.ruuvi_telemetry_hourly",
-            columns: ["avg_temperature", "avg_pressure", "avg_humidity"],
             deviceId: this.props.device.id,
+            sensorName: sensorName,
+            type: "HOURLY",
+            order: {
+                time: "DESC"
+            },
             limit: 10,
-        }).then(() => {
-            this.setState({ showChart: true })
+        }).then((result) => {
+            const data = [...result.payload.body].reverse();
+            this.setState({
+                [sensorName]: {
+                    times: data.map(({ time }) => time),
+                    values: sensorName === 'pressure' ?
+                        data.map(({ avgValueInt }) => Number(avgValueInt.toFixed(2))) :
+                        data.map(({ avgValueDouble }) => Number(avgValueDouble.toFixed(2)))
+                }
+            });
+            callback();
         });
     }
 
     renderChart() {
         const { activeTab } = this.state;
-        const xAxis = [{ categories: this.props.times }];
+        const xAxis = [];
         const series = [];
-        if (activeTab === 1) {
+        if (activeTab === TABS.temperature) {
+            xAxis.push({
+                categories: this.state.temperature.times
+            });
             series.push({
                 name: "Temperature",
-                data: this.props.temperature,
+                data: this.state.temperature.values,
             });
-        } else if (activeTab === 2) {
+        } else if (activeTab === TABS.humidity) {
+            xAxis.push({
+                categories: this.state.humidity.times
+            });
             series.push({
                 name: "Humidity",
-                data: this.props.humidity,
+                data: this.state.humidity.values,
             });
-        } else if (activeTab === 3) {
+        } else if (activeTab === TABS.pressure) {
+            xAxis.push({
+                categories: this.state.pressure.times
+            });
             series.push({
                 name: "Pressure",
-                data: this.props.pressure,
+                data: this.state.pressure.values,
             });
         }
         return <Chart key={activeTab} xAxis={xAxis} series={series} />;
@@ -129,7 +167,7 @@ class ConditionTabs extends React.Component {
                 <RealtimeContainer>
                     <RealtimeValue
                         name="Temperature"
-                        onClick={this._handleTabChange(1)}
+                        onClick={this._handleTabChange(TABS.temperature)}
                     >
                         <Icon type={ICONS.temperature} />
                         {data && data.temperature
@@ -139,7 +177,7 @@ class ConditionTabs extends React.Component {
                     </RealtimeValue>
                     <RealtimeValue
                         name="Humidity"
-                        onClick={this._handleTabChange(2)}
+                        onClick={this._handleTabChange(TABS.humidity)}
                     >
                         <Icon type={ICONS.humidity} />
                         {data && data.humidity
@@ -149,7 +187,7 @@ class ConditionTabs extends React.Component {
                     </RealtimeValue>
                     <RealtimeValue
                         name="Pressure"
-                        onClick={this._handleTabChange(3)}
+                        onClick={this._handleTabChange(TABS.pressure)}
                     >
                         <Icon type={ICONS.pressure} />
                         {data && data.pressure
@@ -159,7 +197,7 @@ class ConditionTabs extends React.Component {
                     </RealtimeValue>
                 </RealtimeContainer>
                 <ActiveTabIndicator activeTab={activeTab} />
-                { this.state.showChart &&
+                { this.state["tab" + activeTab + "Ready"] &&
                     <ChartContainer>
                         <ChartFader fade={fade}>{this.renderChart()}</ChartFader>
                     </ChartContainer>
@@ -170,26 +208,10 @@ class ConditionTabs extends React.Component {
 }
 
 export default connect(
-    (state) => {
-        const latest = state.telemetry.latest
-            ? [...state.telemetry.latest].reverse()
-            : [];
-        return {
-            temperature: latest.map(({ avg_temperature }) =>
-                Number(avg_temperature.toFixed(2))
-            ),
-            humidity: latest.map(({ avg_humidity }) =>
-                Number(avg_humidity.toFixed(2))
-            ),
-            pressure: latest.map(({ avg_pressure }) =>
-                Number(parseFloat(avg_pressure).toFixed(2))
-            ),
-            times: latest.map(({ time }) => time),
-        };
-    },
+    null,
     (dispatch) => ({
         getLatestHourlyTelemetry: (data) => {
-            return dispatch(latestTelemetry(data));
+            return dispatch(aggregateTelemetryQuery(data));
         },
     })
 )(ConditionTabs);

@@ -6,8 +6,7 @@ import { createBrowserHistory } from "history";
 import { Provider } from "react-redux";
 import {
     Auth0Provider,
-    withAuthenticationRequired,
-    useAuth0,
+    withAuthenticationRequired
 } from "@auth0/auth0-react";
 import { store } from "./store.jsx";
 import IoTMap from "./containers/IoTMap.jsx";

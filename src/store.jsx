@@ -4,7 +4,7 @@ import denimMiddleware, {
     Auth0SessionProvider,
     devicesReducer,
     hierarchyReducer,
-} from "@denim/iot-platform-middleware-redux";
+} from "@ceruleandatahub/middleware-redux";
 
 require("dotenv").config();
 

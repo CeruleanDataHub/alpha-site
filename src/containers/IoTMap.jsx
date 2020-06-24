@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {
     findHierarchies,
     findDevices,
-} from "@denim/iot-platform-middleware-redux";
+} from "@ceruleandatahub/middleware-redux";
 import { setToken } from "../store.jsx";
 const highlightColor = [255, 255, 255, 50];
 
