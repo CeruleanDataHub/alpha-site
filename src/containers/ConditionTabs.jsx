@@ -49,7 +49,7 @@ const ActiveTabIndicator = styled.div`
     left: ${(props) => props.activeTab * 206 - 103}px;
     width: 0;
     height: 0;
-    border-bottom: 10px solid #eeeeee;
+    border-bottom: 10px solid #dddddd;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     transition: all 280ms ease-in-out;
