@@ -11,8 +11,10 @@ import { setToken } from "../store.jsx";
 const highlightColor = [255, 255, 255, 50];
 
 const ENTITY_TO_HIERARCHY = {
-    7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d",
-    743: "6bea86bb-d6d6-4fbe-b55f-68c31536aad5",
+    7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d", // Solar
+    743: "61ea841a-52b7-4369-9dd5-2e552fae7b24", // Pluto
+    765: "dc1b571f-44dc-4f71-ab79-487b2a412b2a", // Space
+    771: "c57bedaf-1395-40a8-8cab-bfff1547757c" // Hacklab
 };
 
 class IoTMap extends React.Component {
