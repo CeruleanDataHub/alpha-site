@@ -160,7 +160,7 @@ class ConditionTabs extends React.Component {
     }
 
     render() {
-        const data = this.props.data ? this.props.data.telemetry : null;
+        const realTimeValues = this.props.realTimeValues;
         const { activeTab, fade } = this.state;
         return (
             <ConditionTabsContainer>
@@ -170,8 +170,8 @@ class ConditionTabs extends React.Component {
                         onClick={this._handleTabChange(TABS.temperature)}
                     >
                         <Icon type={ICONS.temperature} />
-                        {data && data.temperature
-                            ? data.temperature.toFixed(2)
+                        {realTimeValues.temperature
+                            ? realTimeValues.temperature.toFixed(2)
                             : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         °C
                     </RealtimeValue>
@@ -180,8 +180,8 @@ class ConditionTabs extends React.Component {
                         onClick={this._handleTabChange(TABS.humidity)}
                     >
                         <Icon type={ICONS.humidity} />
-                        {data && data.humidity
-                            ? data.humidity.toFixed(2)
+                        {realTimeValues.humidity
+                            ? realTimeValues.humidity.toFixed(2)
                             : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         %
                     </RealtimeValue>
@@ -190,8 +190,8 @@ class ConditionTabs extends React.Component {
                         onClick={this._handleTabChange(TABS.pressure)}
                     >
                         <Icon type={ICONS.pressure} />
-                        {data && data.pressure
-                            ? data.pressure.toFixed(2) / 100
+                        {realTimeValues.pressure
+                            ? realTimeValues.pressure.toFixed(2) / 100
                             : REAL_TIME_VALUE_PLACEHOLDER}{" "}
                         HPa
                     </RealtimeValue>

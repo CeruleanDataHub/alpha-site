@@ -42,7 +42,7 @@ const PopupClose = styled.div`
 export default class Popup extends React.Component {
     constructor() {
         super();
-        this.state = { animate: false, deviceData: null, device: null };
+        this.state = { animate: false, device: null, realTimeValues: {} };
         this._handleClose = this._handleClose.bind(this);
     }
 
@@ -66,8 +66,15 @@ export default class Popup extends React.Component {
                 prop: "ADD",
             });
         });
+
         this.socket.on("DEVICE_DATA", (deviceData) => {
-            this.setState({ deviceData });
+            this.setState({
+                realTimeValues: {
+                    temperature: deviceData.telemetry.temperature || this.state.realTimeValues.temperature || null,
+                    humidity: deviceData.telemetry.humidity ||this.state.realTimeValues.humidity || null,
+                    pressure: deviceData.telemetry.pressure || this.state.realTimeValues.pressure || null
+                }
+            });
         });
 
         setTimeout(() => {
@@ -89,7 +96,7 @@ export default class Popup extends React.Component {
         return (
             <PopupContainer animate={this.state.animate}>
                 <PopupClose onClick={this._handleClose}>X</PopupClose>
-                <ConditionTabs data={this.state.deviceData} device={this.props.device} />
+                <ConditionTabs device={this.props.device} realTimeValues={this.state.realTimeValues} />
             </PopupContainer>
         );
     }
