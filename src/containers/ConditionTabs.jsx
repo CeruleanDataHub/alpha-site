@@ -49,7 +49,7 @@ const ActiveTabIndicator = styled.div`
     left: ${(props) => props.activeTab * 206 - 103}px;
     width: 0;
     height: 0;
-    border-bottom: 10px solid #dddddd;
+    border-bottom: 10px solid #eeeeee;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     transition: all 280ms ease-in-out;
@@ -119,7 +119,7 @@ class ConditionTabs extends React.Component {
                 [sensorName]: {
                     times: data.map(({ time }) => time),
                     values: sensorName === 'pressure' ?
-                        data.map(({ avgValueInt }) => Number(avgValueInt.toFixed(2))) :
+                        data.map(({ avgValueInt }) => Number((avgValueInt / 100).toFixed(2))) :
                         data.map(({ avgValueDouble }) => Number(avgValueDouble.toFixed(2)))
                 }
             });
@@ -161,6 +161,23 @@ class ConditionTabs extends React.Component {
 
     render() {
         const realTimeValues = this.props.realTimeValues;
+
+        // Show the latest values from aggregate data until real time values are available
+        // Otherwise the placeholder would be shown for up to one minute (wirepas sensors
+        // send data once per minute)
+
+        const realTimeTemperature = realTimeValues.temperature ?
+            realTimeValues.temperature : this.state.temperature && this.state.temperature.values.length > 0 ?
+                this.state.temperature.values[this.state.temperature.values.length-1] : null;
+
+        const realTimeHumidity = realTimeValues.humidity ?
+            realTimeValues.humidity : this.state.humidity && this.state.humidity.values.length > 0 ?
+                this.state.humidity.values[this.state.humidity.values.length-1] : null;
+
+        const realTimePressure = realTimeValues.pressure ?
+            realTimeValues.pressure / 100 : this.state.pressure && this.state.pressure.values.length > 0 ?
+                this.state.pressure.values[this.state.pressure.values.length-1] : null;
+
         const { activeTab, fade } = this.state;
         return (
             <ConditionTabsContainer>
@@ -170,30 +187,21 @@ class ConditionTabs extends React.Component {
                         onClick={this._handleTabChange(TABS.temperature)}
                     >
                         <Icon type={ICONS.temperature} />
-                        {realTimeValues.temperature
-                            ? realTimeValues.temperature.toFixed(2)
-                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
-                        °C
+                        {realTimeTemperature ? realTimeTemperature.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}°C
                     </RealtimeValue>
                     <RealtimeValue
                         name="Humidity"
                         onClick={this._handleTabChange(TABS.humidity)}
                     >
                         <Icon type={ICONS.humidity} />
-                        {realTimeValues.humidity
-                            ? realTimeValues.humidity.toFixed(2)
-                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
-                        %
+                        {realTimeHumidity ? realTimeHumidity.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}%
                     </RealtimeValue>
                     <RealtimeValue
                         name="Pressure"
                         onClick={this._handleTabChange(TABS.pressure)}
                     >
                         <Icon type={ICONS.pressure} />
-                        {realTimeValues.pressure
-                            ? realTimeValues.pressure.toFixed(2) / 100
-                            : REAL_TIME_VALUE_PLACEHOLDER}{" "}
-                        HPa
+                        {realTimePressure ? realTimePressure.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}HPa
                     </RealtimeValue>
                 </RealtimeContainer>
                 <ActiveTabIndicator activeTab={activeTab} />
