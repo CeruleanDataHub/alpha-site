@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { aggregateTelemetryQuery } from "@ceruleandatahub/middleware-redux";
+import { icons } from './assets/icons/icons';
 
-import { Line } from "@ceruleandatahub/react-components";
-import Icon, { ICONS } from "./Icon.jsx";
+import { Line, Icon } from "@ceruleandatahub/react-components";
 
 const ConditionTabsContainer = styled.div``;
 const RealtimeContainer = styled.ul`
@@ -186,21 +186,21 @@ class ConditionTabs extends React.Component {
                         name="Temperature"
                         onClick={this._handleTabChange(TABS.temperature)}
                     >
-                        <Icon type={ICONS.temperature} />
+                        <Icon customIcon={icons.temperature} />
                         {realTimeTemperature ? realTimeTemperature.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}°C
                     </RealtimeValue>
                     <RealtimeValue
                         name="Humidity"
                         onClick={this._handleTabChange(TABS.humidity)}
                     >
-                        <Icon type={ICONS.humidity} />
+                        <Icon customIcon={icons.humidity} />
                         {realTimeHumidity ? realTimeHumidity.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}%
                     </RealtimeValue>
                     <RealtimeValue
                         name="Pressure"
                         onClick={this._handleTabChange(TABS.pressure)}
                     >
-                        <Icon type={ICONS.pressure} />
+                        <Icon customIcon={icons.pressure} />
                         {realTimePressure ? realTimePressure.toFixed(2) : REAL_TIME_VALUE_PLACEHOLDER}{" "}HPa
                     </RealtimeValue>
                 </RealtimeContainer>
