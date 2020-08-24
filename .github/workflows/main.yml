@@ -37,7 +37,7 @@ jobs:
       name: Get version
       id: prepare
       run: |
-        DOCKER_IMAGE=ceruleandatahub/admin-ui
+        DOCKER_IMAGE=ceruleandatahub/alpha-site
         DOCKER_PLATFORMS=linux/amd64,linux/arm64
         VERSION=edge
         if [[ $GITHUB_REF == refs/tags/* ]]; then
