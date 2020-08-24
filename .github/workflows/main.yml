@@ -23,7 +23,14 @@ jobs:
     - 
       name: Install
       id: Install
-      run: | 
+      run: |
+        export REACT_APP_AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+        export REACT_APP_AUTH0_CLIENT_ID=${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+        export REACT_APP_AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+        export REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+        export REACT_APP_AUTH0_TENANT=${{ secrets.REACT_APP_AUTH0_TENANT }}
+        export REACT_APP_API_ROOT=${{ secrets.REACT_APP_API_ROOT }}
+        export REACT_APP_API_VERSION=${{ secrets.REACT_APP_API_VERSION }}
         npm install
         npm run build
     -
