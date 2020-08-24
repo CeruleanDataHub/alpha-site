@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { aggregateTelemetryQuery } from "@ceruleandatahub/middleware-redux";
 
-import { Chart } from "@ceruleandatahub/react-components";
+import { Line } from "@ceruleandatahub/react-components";
 import Icon, { ICONS } from "./Icon.jsx";
 
 const ConditionTabsContainer = styled.div``;
@@ -156,7 +156,7 @@ class ConditionTabs extends React.Component {
                 data: this.state.pressure.values,
             });
         }
-        return <Chart key={activeTab} xAxis={xAxis} series={series} />;
+        return <Line key={activeTab} xAxis={xAxis} series={series} />;
     }
 
     render() {

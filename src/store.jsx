@@ -10,6 +10,8 @@ require("dotenv").config();
 
 const settingsProvider = {
     API_URL: process.env.REACT_APP_API_URL,
+    API_ROOT: process.env.REACT_APP_API_ROOT,
+    API_VERSION: process.env.REACT_APP_API_VERSION,
 };
 
 const cacheProvider = {};
