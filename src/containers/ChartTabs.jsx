@@ -30,30 +30,27 @@ const ChartTabs = ({ device }) => {
 
     const averageValueIntegers = getAverageValueIntegers(latestHourlyTelemetry);
     const averageValueDoubles = getAverageValueDoubles(latestHourlyTelemetry);
-    const dates = getTimes(latestHourlyTelemetry).reverse();
     const lineChartValues = getLineChartValues(
         averageValueIntegers,
         averageValueDoubles
     );
+    const series = populateSeriesData(activeTab, lineChartValues);
+    const dates = getTimes(latestHourlyTelemetry).reverse();
+    const xAxis = populateXAxisData(dates);
 
-    const series = {
-        name: activeTab,
-        data: lineChartValues,
-    };
-
-    const xAxis = [{ categories: dates }];
-
-    const isActiveTab = (tab) => activeTab === tab;
+    const isActiveTab = (tab) => getActiveTab(activeTab, tab);
+    const getIcon = (tab) => icons[tab.toLowerCase()];
 
     return (
         <>
             <TabContainer>
-                {tabs.map((tab) => (
+                {tabs.map((tab, key) => (
                     <Tab
+                        key={key}
                         active={isActiveTab(tab)}
                         onClick={() => setActiveTab(tab)}
                         text={tab}
-                        icon={<Icon customIcon={icons[tab.toLowerCase()]} />}
+                        icon={<Icon customIcon={getIcon(tab)} />}
                     />
                 ))}
             </TabContainer>
@@ -98,5 +95,14 @@ const getLineChartValues = (averageValueIntegers, averageValueDoubles) =>
 
 const dispatchAggregateTelemetryQuery = (dispatch) =>
     flow([telemetryQueryData, aggregateTelemetryQuery, dispatch]);
+
+const getActiveTab = (activeTab, tab) => activeTab === tab;
+
+const populateSeriesData = (activeTab, lineChartValues) => ({
+    name: activeTab,
+    data: lineChartValues,
+});
+
+const populateXAxisData = (dates) => [{ categories: dates }];
 
 export default ChartTabs;
