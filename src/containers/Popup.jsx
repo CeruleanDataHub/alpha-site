@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import io from "socket.io-client";
-import ConditionTabs from "./ConditionTabs.jsx";
+import ChartTabs from "./ChartTabs.jsx";
 
 const PopupContainer = styled.div`
     position: absolute;
@@ -70,10 +70,19 @@ export default class Popup extends React.Component {
         this.socket.on("DEVICE_DATA", (deviceData) => {
             this.setState({
                 realTimeValues: {
-                    temperature: deviceData.telemetry.temperature || this.state.realTimeValues.temperature || null,
-                    humidity: deviceData.telemetry.humidity ||this.state.realTimeValues.humidity || null,
-                    pressure: deviceData.telemetry.pressure || this.state.realTimeValues.pressure || null
-                }
+                    temperature:
+                        deviceData.telemetry.temperature ||
+                        this.state.realTimeValues.temperature ||
+                        null,
+                    humidity:
+                        deviceData.telemetry.humidity ||
+                        this.state.realTimeValues.humidity ||
+                        null,
+                    pressure:
+                        deviceData.telemetry.pressure ||
+                        this.state.realTimeValues.pressure ||
+                        null,
+                },
             });
         });
 
@@ -83,8 +92,8 @@ export default class Popup extends React.Component {
     }
 
     componentWillUnmount() {
-        if (!this.socket) { 
-            return 
+        if (!this.socket) {
+            return;
         }
         this.socket.emit("UPDATE_DEVICE_SELECTION", {
             ...this.data,
@@ -96,7 +105,10 @@ export default class Popup extends React.Component {
         return (
             <PopupContainer animate={this.state.animate}>
                 <PopupClose onClick={this._handleClose}>X</PopupClose>
-                <ConditionTabs device={this.props.device} realTimeValues={this.state.realTimeValues} />
+                <ChartTabs
+                    device={this.props.device}
+                    realTimeValues={this.state.realTimeValues}
+                />
             </PopupContainer>
         );
     }

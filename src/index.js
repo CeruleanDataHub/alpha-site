@@ -13,12 +13,21 @@ import IoTMap from "./containers/IoTMap.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+import PropTypes from 'prop-types';
 
 export const history = createBrowserHistory();
 
-const ProtectedRoute = ({ component, ...args }) => (
-    <Route component={withAuthenticationRequired(component)} {...args} />
-);
+const ProtectedRoute = ({ component, ...args }) => {
+    return (
+        <Route component={withAuthenticationRequired(component)} {...args} />
+    );
+
+};
+
+ProtectedRoute.propTypes = {
+     component: PropTypes.node,
+}
+
 
 const onRedirectCallback = (appState) => {
     history.replace(appState?.returnTo || window.location.pathname);
