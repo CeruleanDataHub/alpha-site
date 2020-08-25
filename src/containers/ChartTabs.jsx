@@ -4,7 +4,7 @@ import { aggregateTelemetryQuery } from "@ceruleandatahub/middleware-redux";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { icons } from "./assets/icons/icons";
-import { flow, map, some } from "lodash";
+import { flow, map, round, some } from "lodash";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
 
@@ -80,6 +80,8 @@ const telemetryQueryData = (device, activeTab) => ({
 
 const divideEachByHundred = (dividend) => map(dividend, (item) => item / 100);
 
+const roundEachByTwo = (iterable) => map(iterable, (item) => round(item, 2));
+
 const getTimes = (latestHourlyTelemetry) => map(latestHourlyTelemetry, "time");
 
 const getAverageValueIntegers = (latestHourlyTelemetry) =>
@@ -90,8 +92,8 @@ const getAverageValueDoubles = (latestHourlyTelemetry) =>
 
 const getLineChartValues = (averageValueIntegers, averageValueDoubles) =>
     some(averageValueIntegers)
-        ? divideEachByHundred(averageValueIntegers)
-        : averageValueDoubles;
+        ? roundEachByTwo(divideEachByHundred(averageValueIntegers))
+        : roundEachByTwo(averageValueDoubles);
 
 const dispatchAggregateTelemetryQuery = (dispatch) =>
     flow([telemetryQueryData, aggregateTelemetryQuery, dispatch]);
