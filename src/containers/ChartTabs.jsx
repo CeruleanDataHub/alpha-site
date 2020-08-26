@@ -79,9 +79,10 @@ const telemetryQueryData = (device, activeTab) => ({
     limit: 10,
 });
 
-const divideEachByHundred = (dividend) => map(dividend, (item) => item / 100);
+const divideEachByHundred = (dividends) => map(dividends, (item) => item / 100);
 
-const roundEachByTwo = (iterable) => map(iterable, (item) => round(item, 2));
+const roundEachByTwo = (roundables) =>
+    map(roundables, (item) => round(item, 2));
 
 const getTimes = (latestHourlyTelemetry) => map(latestHourlyTelemetry, "time");
 
