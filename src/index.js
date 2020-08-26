@@ -11,6 +11,7 @@ import IoTMap from "./containers/IoTMap.jsx";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import PropTypes from "prop-types";
+import { ModalProvider } from "styled-react-modal/";
 
 export const history = createBrowserHistory();
 
@@ -27,20 +28,22 @@ const onRedirectCallback = (appState) =>
 
 ReactDOM.render(
     <Provider store={store}>
-        <Auth0Provider
-            domain={process.env.REACT_APP_AUTH0_DOMAIN}
-            clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
-            redirectUri={window.location.origin}
-            onRedirectCallback={onRedirectCallback}
-        >
-            {
-                <Router history={history}>
-                    <Switch>
-                        <ProtectedRoute path="/" component={IoTMap} />
-                    </Switch>
-                </Router>
-            }
-        </Auth0Provider>
+        <ModalProvider>
+            <Auth0Provider
+                domain={process.env.REACT_APP_AUTH0_DOMAIN}
+                clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
+                redirectUri={window.location.origin}
+                onRedirectCallback={onRedirectCallback}
+            >
+                {
+                    <Router history={history}>
+                        <Switch>
+                            <ProtectedRoute path="/" component={IoTMap} />
+                        </Switch>
+                    </Router>
+                }
+            </Auth0Provider>
+        </ModalProvider>
     </Provider>,
     document.getElementById("root")
 );
