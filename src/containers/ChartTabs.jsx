@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { icons } from "./assets/icons/icons";
 import { flow, map, round, some } from "lodash";
+import PropTypes from "prop-types";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
 
@@ -106,5 +107,9 @@ const populateSeriesData = (activeTab, lineChartValues) => ({
 });
 
 const populateXAxisData = (dates) => [{ categories: dates }];
+
+ChartTabs.propTypes = {
+    device: PropTypes.shape({}),
+};
 
 export default ChartTabs;
