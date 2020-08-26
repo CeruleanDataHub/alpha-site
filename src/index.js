@@ -19,8 +19,8 @@ const ProtectedRoute = ({ component, ...args }) => (
 );
 
 ProtectedRoute.propTypes = {
-     component: PropTypes.node,
-}
+    component: PropTypes.shape({}),
+};
 
 const onRedirectCallback = (appState) =>
     history.replace(appState?.returnTo || window.location.pathname);
