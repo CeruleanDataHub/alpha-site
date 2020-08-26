@@ -4,34 +4,27 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { Provider } from "react-redux";
-import {
-    Auth0Provider,
-    withAuthenticationRequired
-} from "@auth0/auth0-react";
+import { Auth0Provider, withAuthenticationRequired } from "@auth0/auth0-react";
 import { store } from "./store.jsx";
 import IoTMap from "./containers/IoTMap.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 export const history = createBrowserHistory();
 
-const ProtectedRoute = ({ component, ...args }) => {
-    return (
-        <Route component={withAuthenticationRequired(component)} {...args} />
-    );
-
-};
+const ProtectedRoute = ({ component, ...args }) => (
+    <Route component={withAuthenticationRequired(component)} {...args} />
+);
 
 ProtectedRoute.propTypes = {
      component: PropTypes.node,
 }
 
-
-const onRedirectCallback = (appState) => {
+const onRedirectCallback = (appState) =>
     history.replace(appState?.returnTo || window.location.pathname);
-};
+
 ReactDOM.render(
     <Provider store={store}>
         <Auth0Provider
