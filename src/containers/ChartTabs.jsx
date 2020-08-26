@@ -27,7 +27,7 @@ const ChartTabs = ({ device }) => {
 
     useEffect(() => {
         dispatchAggregateTelemetryQuery(dispatch)(device, activeTab);
-    }, [activeTab]);
+    }, [dispatch, device, activeTab]);
 
     const averageValueIntegers = getAverageValueIntegers(latestHourlyTelemetry);
     const averageValueDoubles = getAverageValueDoubles(latestHourlyTelemetry);
