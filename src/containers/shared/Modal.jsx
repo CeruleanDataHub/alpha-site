@@ -1,8 +1,8 @@
 import React from "react";
-import Modal from "styled-react-modal";
+import StyledModal from "styled-react-modal";
 import PropTypes from "prop-types";
 
-const PopupModal = Modal.styled`
+const ModalContainer = StyledModal.styled`
     display: flex;
     background-color: white;
     flex-direction: column;
@@ -13,20 +13,20 @@ const PopupModal = Modal.styled`
     align-items: center;
 `;
 
-const Popup = ({ isVisible, handlePopupClose, children }) => (
+const Modal = ({ isVisible, handlePopupClose, children }) => (
     <>
         {isVisible && (
-            <PopupModal isOpen={true} onBackgroundClick={handlePopupClose}>
+            <ModalContainer isOpen={true} onBackgroundClick={handlePopupClose}>
                 {children}
-            </PopupModal>
+            </ModalContainer>
         )}
     </>
 );
 
-Popup.propTypes = {
+Modal.propTypes = {
     isVisible: PropTypes.bool.isRequired,
     handlePopupClose: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
 };
 
-export default Popup;
+export default Modal;

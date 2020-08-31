@@ -2,7 +2,7 @@ import { Icon, Tab } from "@ceruleandatahub/react-components";
 import React from "react";
 
 import PropTypes from "prop-types";
-import { icons } from "./assets/icons/icons";
+import { icons } from "../assets/icons/icons";
 
 const Tabs = ({ tabs, activeTab, setActiveTab }) => (
     <>

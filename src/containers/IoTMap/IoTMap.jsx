@@ -3,10 +3,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
 import { findHierarchies } from "@ceruleandatahub/middleware-redux";
 import { find, flow, get } from "lodash";
-import { setToken } from "../store";
-import Popup from "./Popup";
-import SpinnerTentative from "./SpinnerTentative";
-import PopupTabs from "./PopupTabs";
+import { setToken } from "../../store";
+import Modal from "../shared/Modal";
+import SpinnerTentative from "../shared/SpinnerTentative";
+import IoTMapModal from "./IoTMapModal";
 
 const highlightColor = [255, 255, 255, 50];
 
@@ -89,17 +89,17 @@ const IoTMap = () => {
     return (
         <div>
             <div id="map" ref={mapRef} />
-            <Popup
+            <Modal
                 isVisible={showTelemetry}
                 handlePopupClose={handlePopupClose}
             >
                 <SpinnerTentative condition={!!hierarchy}>
-                    <PopupTabs
+                    <IoTMapModal
                         clickedIndoorEntity={clickedIndoorEntity}
                         hierarchy={hierarchy}
                     />
                 </SpinnerTentative>
-            </Popup>
+            </Modal>
         </div>
     );
 };

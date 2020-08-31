@@ -10,7 +10,7 @@ const Content = styled.div`
     padding: 0.2em 0 0 0.1em;
 `;
 
-const Chart = ({ activeTab, device }) => {
+const IndoorEntityChart = ({ activeTab, device }) => {
     const dispatch = useDispatch();
 
     const latestHourlyTelemetry = useSelector(
@@ -77,9 +77,9 @@ const populateSeriesData = (activeTab, lineChartValues) => ({
 
 const populateXAxisData = (dates) => [{ categories: dates }];
 
-Chart.propTypes = {
+IndoorEntityChart.propTypes = {
     activeTab: PropTypes.string.isRequired,
     device: PropTypes.shape({}),
 };
 
-export default Chart;
+export default IndoorEntityChart;

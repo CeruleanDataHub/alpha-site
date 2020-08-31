@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { flow, get } from "lodash";
 import PropTypes from "prop-types";
-import Chart from "./Chart";
-import SpinnerTentative from "./SpinnerTentative";
-import Tabs from "./Tabs";
+import IndoorEntityChart from "./IndoorEntityChart/IndoorEntityChart";
+import SpinnerTentative from "../shared/SpinnerTentative";
+import Tabs from "../shared/Tabs";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
 
@@ -15,7 +15,7 @@ const TabsContainer = styled.div`
     padding: 0.2em 0 0 0.1em;
 `;
 
-const PopupTabs = ({ hierarchy }) => {
+const IoTMapModal = ({ hierarchy }) => {
     const dispatch = useDispatch();
 
     const device = useSelector((state) => {
@@ -39,7 +39,7 @@ const PopupTabs = ({ hierarchy }) => {
             </TabsContainer>
 
             <SpinnerTentative condition={!!device}>
-                <Chart activeTab={activeTab} device={device} />
+                <IndoorEntityChart activeTab={activeTab} device={device} />
             </SpinnerTentative>
         </>
     );
@@ -56,10 +56,10 @@ const devicesQueryData = (hierarchy) => ({
 
 const getDevice = (state) => get(state, "device.devices[0]");
 
-PopupTabs.propTypes = {
+IoTMapModal.propTypes = {
     device: PropTypes.shape({}),
     clickedIndoorEntity: PropTypes.shape({}).isRequired,
     hierarchy: PropTypes.shape({}),
 };
 
-export default PopupTabs;
+export default IoTMapModal;
