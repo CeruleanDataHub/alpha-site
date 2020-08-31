@@ -7,6 +7,7 @@ import { icons } from "./assets/icons/icons";
 import { flow, get } from "lodash";
 import PropTypes from "prop-types";
 import Chart from "./Chart";
+import SpinnerTentative from "./SpinnerTentative";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
 
@@ -45,7 +46,9 @@ const Tabs = ({ hierarchy }) => {
                 ))}
             </TabContainer>
 
-            {device && <Chart activeTab={activeTab} device={device} />}
+            <SpinnerTentative condition={device}>
+                <Chart activeTab={activeTab} device={device} />
+            </SpinnerTentative>
         </>
     );
 };

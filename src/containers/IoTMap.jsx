@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
-import Popup from "./Popup";
 import { findHierarchies } from "@ceruleandatahub/middleware-redux";
 import { find, flow, get } from "lodash";
 import { setToken } from "../store";
+import Popup from "./Popup";
 import Tabs from "./Tabs";
+import SpinnerTentative from "./SpinnerTentative";
 
 const highlightColor = [255, 255, 255, 50];
 
@@ -59,9 +60,7 @@ const IoTMap = () => {
     const onOutdoorsEntityClick = useCallback((event) => {
         const indoorMapEntityData = getIndoorMapEntityData(event);
 
-        // noinspection JSUnresolvedFunction
         indoorMapEntityData.addTo(mapDataRef.current);
-        // noinspection JSUnresolvedFunction
         event.target.setFloor(5);
     }, []);
 
@@ -75,6 +74,7 @@ const IoTMap = () => {
         handleSetToken();
 
         const indoors = getIndoorEntity(window);
+
         setIndoorsEntityClickEventListener(indoors, onIndoorsEntityClick);
         setOutdoorsEntityClickEventListener(indoors, onOutdoorsEntityClick);
 
@@ -89,14 +89,17 @@ const IoTMap = () => {
     return (
         <div>
             <div id="map" ref={mapRef} />
-            {showTelemetry && hierarchy && (
-                <Popup handlePopupClose={handlePopupClose}>
+            <Popup
+                isVisible={showTelemetry}
+                handlePopupClose={handlePopupClose}
+            >
+                <SpinnerTentative condition={hierarchy}>
                     <Tabs
                         clickedIndoorEntity={clickedIndoorEntity}
                         hierarchy={hierarchy}
                     />
-                </Popup>
-            )}
+                </SpinnerTentative>
+            </Popup>
         </div>
     );
 };

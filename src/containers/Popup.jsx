@@ -13,13 +13,18 @@ const PopupModal = Modal.styled`
     align-items: center;
 `;
 
-const Popup = ({ handlePopupClose, children }) => (
-    <PopupModal isOpen={true} onBackgroundClick={handlePopupClose}>
-        {children}
-    </PopupModal>
+const Popup = ({ isVisible, handlePopupClose, children }) => (
+    <>
+        {isVisible && (
+            <PopupModal isOpen={true} onBackgroundClick={handlePopupClose}>
+                {children}
+            </PopupModal>
+        )}
+    </>
 );
 
 Popup.propTypes = {
+    isVisible: PropTypes.bool.isRequired,
     handlePopupClose: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
 };
