@@ -5,8 +5,8 @@ import { findHierarchies } from "@ceruleandatahub/middleware-redux";
 import { find, flow, get } from "lodash";
 import { setToken } from "../store";
 import Popup from "./Popup";
-import Tabs from "./Tabs";
 import SpinnerTentative from "./SpinnerTentative";
+import PopupTabs from "./PopupTabs";
 
 const highlightColor = [255, 255, 255, 50];
 
@@ -93,8 +93,8 @@ const IoTMap = () => {
                 isVisible={showTelemetry}
                 handlePopupClose={handlePopupClose}
             >
-                <SpinnerTentative condition={hierarchy}>
-                    <Tabs
+                <SpinnerTentative condition={!!hierarchy}>
+                    <PopupTabs
                         clickedIndoorEntity={clickedIndoorEntity}
                         hierarchy={hierarchy}
                     />

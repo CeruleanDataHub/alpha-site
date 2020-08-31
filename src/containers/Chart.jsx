@@ -79,7 +79,7 @@ const populateXAxisData = (dates) => [{ categories: dates }];
 
 Chart.propTypes = {
     activeTab: PropTypes.string.isRequired,
-    device: PropTypes.shape({}).isRequired,
+    device: PropTypes.shape({}),
 };
 
 export default Chart;
