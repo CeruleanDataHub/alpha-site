@@ -2,8 +2,6 @@ import React from "react";
 import Modal from "styled-react-modal";
 import PropTypes from "prop-types";
 
-import ChartTabs from "./ChartTabs.jsx";
-
 const PopupModal = Modal.styled`
     display: flex;
     background-color: white;
@@ -15,17 +13,15 @@ const PopupModal = Modal.styled`
     align-items: center;
 `;
 
-const Popup = ({ device, handlePopupClose }) => (
+const Popup = ({ handlePopupClose, children }) => (
     <PopupModal isOpen={true} onBackgroundClick={handlePopupClose}>
-        <ChartTabs device={device} />
+        {children}
     </PopupModal>
 );
 
 Popup.propTypes = {
-    device: PropTypes.shape({
-        external_id: PropTypes.string.isRequired,
-    }).isRequired,
     handlePopupClose: PropTypes.func.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 export default Popup;

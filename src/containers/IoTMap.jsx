@@ -1,172 +1,171 @@
-import React from "react";
-import { withAuth0 } from "@auth0/auth0-react";
-
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useDispatch, useSelector } from "react-redux";
 import Popup from "./Popup";
-import { connect } from "react-redux";
-import {
-    findHierarchies,
-    findDevices,
-} from "@ceruleandatahub/middleware-redux";
-import { setToken } from "../store.jsx";
+import { findHierarchies } from "@ceruleandatahub/middleware-redux";
+import { find, flow, get } from "lodash";
+import { setToken } from "../store";
+import Tabs from "./Tabs";
+
 const highlightColor = [255, 255, 255, 50];
+
+const IoTMap = () => {
+    const { getAccessTokenSilently } = useAuth0();
+
+    const dispatch = useDispatch();
+
+    const mapRef = useRef(null);
+
+    const hierarchy = useSelector((state) => {
+        return getHierarchy(state);
+    });
+
+    const [mapData, _setMap] = useState({});
+    const mapDataRef = useRef(mapData);
+    const setMapDataStateAndRef = (mapData) => {
+        _setMap(mapData);
+        mapDataRef.current = mapData;
+    };
+
+    const [clickedIndoorEntity, _setClickedIndoorEntity] = useState({});
+    const clickedIndoorEntityRef = useRef(clickedIndoorEntity);
+    const setClickedIndoorEntityRefAndState = (clickedIndoorEntityData) => {
+        _setClickedIndoorEntity(clickedIndoorEntityData);
+        clickedIndoorEntityRef.current = clickedIndoorEntityData;
+    };
+
+    const [showTelemetry, setShowTelemetry] = useState(false);
+
+    const onIndoorsEntityClick = useCallback(
+        async (indoorEntity) => {
+            const indoors = indoorEntity.target;
+
+            setClickedIndoorEntityRefAndState(indoorEntity);
+
+            const hierarchyUUID = getHierarchyUUID(
+                clickedIndoorEntityRef.current
+            );
+
+            dispatchHierarchiesQuery(dispatch)(hierarchyUUID);
+
+            clearEntityHighlightsFor(indoors)(indoorEntity.ids);
+            setEntityHighlightsFor(indoors)(indoorEntity.ids, highlightColor);
+
+            setShowTelemetry(true);
+        },
+        [dispatch]
+    );
+
+    const onOutdoorsEntityClick = useCallback((event) => {
+        const indoorMapEntityData = getIndoorMapEntityData(event);
+
+        // noinspection JSUnresolvedFunction
+        indoorMapEntityData.addTo(mapDataRef.current);
+        // noinspection JSUnresolvedFunction
+        event.target.setFloor(5);
+    }, []);
+
+    useEffect(() => {
+        const handleSetToken = async () => {
+            const token = await getAccessTokenSilently();
+
+            return setToken(token);
+        };
+
+        handleSetToken();
+
+        const indoors = getIndoorEntity(window);
+        setIndoorsEntityClickEventListener(indoors, onIndoorsEntityClick);
+        setOutdoorsEntityClickEventListener(indoors, onOutdoorsEntityClick);
+
+        const worldMap = getWorldMap(window);
+        setMapDataStateAndRef(worldMap);
+    }, [onOutdoorsEntityClick, getAccessTokenSilently, onIndoorsEntityClick]);
+
+    const handlePopupClose = () => {
+        setShowTelemetry(false);
+    };
+
+    return (
+        <div>
+            <div id="map" ref={mapRef} />
+            {showTelemetry && hierarchy && (
+                <Popup handlePopupClose={handlePopupClose}>
+                    <Tabs
+                        clickedIndoorEntity={clickedIndoorEntity}
+                        hierarchy={hierarchy}
+                    />
+                </Popup>
+            )}
+        </div>
+    );
+};
+
+const hierarchiesQueryData = (hierarchyUUID) => ({
+    select: ["id"],
+    where: { uuid: hierarchyUUID },
+    take: 1,
+});
 
 const ENTITY_TO_HIERARCHY = {
     7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d", // Solar
     743: "61ea841a-52b7-4369-9dd5-2e552fae7b24", // Pluto
     765: "dc1b571f-44dc-4f71-ab79-487b2a412b2a", // Space
-    771: "c57bedaf-1395-40a8-8cab-bfff1547757c" // Hacklab
+    771: "c57bedaf-1395-40a8-8cab-bfff1547757c", // Hacklab
 };
 
-class IoTMap extends React.Component {
-    constructor() {
-        super();
-        this._onEnter = this._onEnter.bind(this);
-        this._resolveIndoorMapEntity = this._resolveIndoorMapEntity.bind(this);
-        this._indoorEntityClicked = this._indoorEntityClicked.bind(this);
-        this.state = { map: undefined, showTelemetry: false };
-        this.handlePopupClose = this.handlePopupClose.bind(this);
-    }
+const dispatchHierarchiesQuery = (dispatch) =>
+    flow([hierarchiesQueryData, findHierarchies, dispatch]);
 
-    _onEnter(event) {
-        const indoorMapEntityInformation = new window.L.Wrld.indoorMapEntities.indoorMapEntityInformation(
-            event.indoorMap.getIndoorMapId()
-        );
-        indoorMapEntityInformation.addTo(this.state.map);
-        this.setState({ entityInfo: indoorMapEntityInformation });
-        event.target.setFloor(5);
-    }
+const getHierarchyUUID = (event) => ENTITY_TO_HIERARCHY[event.ids[0]];
 
-    _resolveIndoorMapEntity(entities, id) {
-        return entities.filter(
-            (entity) => entity.getIndoorMapEntityId() === id
-        )[0];
-    }
+const populateWorldMap = (world) =>
+    world.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
+        center: [60.19109, 24.94946],
+        zoom: 15,
+        indoorsEnabled: true,
+        //Reduce CPU Usage
+        trafficEnabled: false,
+        frameRateThrottleWhenIdleEnabled: true,
+        throttledTargetFrameIntervalMilliseconds: 500,
+        idleSecondsBeforeFrameRateThrottle: 15.0,
+    });
 
-    async _indoorEntityClicked(event) {
-        const entity = this._resolveIndoorMapEntity(
-            this.state.entityInfo.getIndoorMapEntities(),
-            event.ids[0]
-        );
-        const indoors = event.target;
-        const entityPosition = entity.getPosition();
-        const elevatedPosition = window.L.latLng(
-            entityPosition.lat,
-            entityPosition.lng,
-            35
-        );
+const setOutdoorsEntityClickEventListener = (indoors, onOutdoorsEntityClick) =>
+    indoors.on("indoormapenter", (event) => onOutdoorsEntityClick(event));
 
-        // Clear first, only one entity can be active at any given time
-        indoors.clearEntityHighlights(this.state.selectedEntityIds);
-        indoors.setEntityHighlights(event.ids, highlightColor);
-        this.setState({
-            entityCoordinates: this.state.map.latLngToLayerPoint(
-                elevatedPosition
-            ),
-        });
+const getHierarchy = (state) => get(state, "hierarchy.hierarchies[0]");
 
-        const indoorMapEntityId = entity.getIndoorMapEntityId();
-        const hierarchyUUID = ENTITY_TO_HIERARCHY[indoorMapEntityId];
+const setIndoorsEntityClickEventListener = (indoors, onIndoorsEntityClick) =>
+    indoors.on("indoorentityclick", (event) => onIndoorsEntityClick(event));
 
-        if (!hierarchyUUID) {
-            console.error(
-                `No hierarchy found for indoorMapEntity ${indoorMapEntityId}`
-            );
-            this.setState({ showTelemetry: false });
-            return;
-        }
+const getIndoors = (worldMap) => get(worldMap, "indoors");
 
-        await this.props.getHierarchies({
-            select: ["id"],
-            where: { uuid: hierarchyUUID },
-            take: 1,
-        });
+const getWorld = (window) => get(window, "L.Wrld");
 
-        if (!this.props.hierarchy) {
-            console.log(`No hierarchy found with UUID ${hierarchyUUID}`);
-            this.setState({ showTelemetry: false });
-            return;
-        }
+const getIndoorMapEntityData = (event) =>
+    flow([findGetIndoorMapId, indoorMapEntityInformationGetter])(event);
 
-        await this.props.getDevices({
-            select: ["id", "external_id"],
-            where: { hierarchy_id: this.props.hierarchy.id },
-            take: 1,
-        });
+const getWorldMap = flow([getWorld, populateWorldMap]);
 
-        if (!this.props.device) {
-            console.log(
-                `No device found with hierarchy_id ${this.props.hierarchy.id}`
-            );
-            this.setState({ showTelemetry: false });
-            return;
-        }
+const getIndoorEntity = flow([getWorldMap, getIndoors]);
 
-        this.setState({ showTelemetry: true });
-    }
+const getIndoorMapEntityInformationGetter = get(
+    window,
+    "L.Wrld.indoorMapEntities.indoorMapEntityInformation"
+);
 
-    async componentDidMount() {
-        const { getAccessTokenSilently } = this.props.auth0;
-        const token = await getAccessTokenSilently({
-            audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-        });
+const getClearEntityHighlights = (event) => get(event, "clearEntityHighlights");
 
-        setToken(token);
+const clearEntityHighlightsFor = (indoors) => getClearEntityHighlights(indoors);
 
-        var map = window.L.Wrld.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
-            center: [60.19109, 24.94946],
-            zoom: 15,
-            indoorsEnabled: true,
-            //Reduce CPU Usage
-            trafficEnabled: false,
-            frameRateThrottleWhenIdleEnabled: true,
-            throttledTargetFrameIntervalMilliseconds: 500,
-            idleSecondsBeforeFrameRateThrottle: 15.0,
-        });
-        map.indoors.on("indoormapenter", this._onEnter);
-        map.indoors.on("indoorentityclick", this._indoorEntityClicked);
+const getSetEntityHighlights = (event) => get(event, "setEntityHighlights");
 
-        // save map and layer references to local state
-        this.setState({
-            map: map,
-        });
-    }
+const setEntityHighlightsFor = (indoors) => getSetEntityHighlights(indoors);
 
-    handlePopupClose() {
-        this.setState({ showTelemetry: false });
-    }
+const indoorMapEntityInformationGetter = (event) =>
+    getIndoorMapEntityInformationGetter(event);
 
-    render() {
-        return (
-            <div>
-                <div id="map" ref="mapContainer"></div>
-                {this.state.showTelemetry && this.props.device && (
-                    <Popup
-                        device={this.props.device}
-                        handlePopupClose={this.handlePopupClose}
-                    />
-                )}
-            </div>
-        );
-    }
-}
+const findGetIndoorMapId = (event) => find(event, "getIndoorMapId");
 
-export default connect(
-    (state) => {
-        const hierarchies = state.hierarchy.hierarchies || [];
-        const hierarchy = hierarchies.length > 0 ? hierarchies[0] : null;
-        const devices = state.device.devices || [];
-        const device = devices.length > 0 ? devices[0] : null;
-        return {
-            hierarchy,
-            device,
-        };
-    },
-    (dispatch) => ({
-        getHierarchies: (query) => {
-            return dispatch(findHierarchies(query));
-        },
-        getDevices: (query) => {
-            return dispatch(findDevices(query));
-        },
-    })
-)(withAuth0(IoTMap));
+export default IoTMap;

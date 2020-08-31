@@ -20,7 +20,7 @@ const ProtectedRoute = ({ component, ...args }) => (
 );
 
 ProtectedRoute.propTypes = {
-    component: PropTypes.shape({}),
+    component: PropTypes.func,
 };
 
 const onRedirectCallback = (appState) =>
@@ -31,6 +31,7 @@ ReactDOM.render(
         <ModalProvider>
             <Auth0Provider
                 domain={process.env.REACT_APP_AUTH0_DOMAIN}
+                audience={process.env.REACT_APP_AUTH0_AUDIENCE}
                 clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
                 redirectUri={window.location.origin}
                 onRedirectCallback={onRedirectCallback}

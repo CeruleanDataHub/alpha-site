@@ -1,27 +1,31 @@
 import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
-import createAuth0Client from "@auth0/auth0-spa-js";
-import { setToken } from './store.jsx';
+import createAuth0Client from "@auth0/auth0-react";
+import { setToken } from "./store.jsx";
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
     window.history.replaceState({}, document.title, window.location.pathname);
 
-export const Auth0Context = React.createContext();
+export const Auth0Context = React.createContext({});
 export const useAuth0 = () => useContext(Auth0Context);
 export const Auth0Provider = ({
     children,
     onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
     ...initOptions
 }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState();
-    const [user, setUser] = useState();
-    const [auth0Client, setAuth0] = useState();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState({});
+    const [auth0Client, setAuth0] = useState({});
     const [loading, setLoading] = useState(true);
     const [popupOpen, setPopupOpen] = useState(false);
 
     useEffect(() => {
         const initAuth0 = async () => {
-            const auth0FromHook = await createAuth0Client(initOptions);
+            const auth0FromHook = await createAuth0Client({
+                ...initOptions,
+                cacheLocation: "localstorage",
+            });
+
             setAuth0(auth0FromHook);
 
             if (
@@ -35,22 +39,20 @@ export const Auth0Provider = ({
             }
 
             const isAuthenticated = await auth0FromHook.isAuthenticated();
-
             setIsAuthenticated(isAuthenticated);
 
             if (isAuthenticated) {
                 const user = await auth0FromHook.getUser();
                 setUser(user);
+
                 const token = await auth0FromHook.getTokenSilently();
                 setToken(token);
-            } else {
-                auth0FromHook.loginWithRedirect({ returnTo: window.location.origin + "/" });
             }
 
             setLoading(false);
         };
+
         initAuth0();
-        // eslint-disable-next-line
     }, []);
 
     const loginWithPopup = async (params = {}) => {
