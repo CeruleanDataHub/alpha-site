@@ -24,19 +24,22 @@ const IoTMap = () => {
     const [mapData, _setMap] = useState({});
     const mapDataRef = useRef(mapData);
     const setMapDataRef = (data) => (mapDataRef.current = data);
-    const setMapDataStateAndRef = (mapData) => {
+    const setMapDataStateAndRef = useCallback((mapData) => {
         _setMap(mapData);
         setMapDataRef(mapData);
-    };
+    }, []);
 
     const [clickedIndoorEntity, _setClickedIndoorEntity] = useState({});
     const clickedIndoorEntityRef = useRef(clickedIndoorEntity);
     const setClickedIndoorEntityRef = (data) =>
         (clickedIndoorEntityRef.current = data);
-    const setClickedIndoorEntityRefAndState = (clickedIndoorEntityData) => {
-        _setClickedIndoorEntity(clickedIndoorEntityData);
-        setClickedIndoorEntityRef(clickedIndoorEntityData);
-    };
+    const setClickedIndoorEntityRefAndState = useCallback(
+        (clickedIndoorEntityData) => {
+            _setClickedIndoorEntity(clickedIndoorEntityData);
+            setClickedIndoorEntityRef(clickedIndoorEntityData);
+        },
+        []
+    );
 
     const [showTelemetry, setShowTelemetry] = useState(false);
 
@@ -57,7 +60,7 @@ const IoTMap = () => {
 
             setShowTelemetry(true);
         },
-        [dispatch]
+        [dispatch, setClickedIndoorEntityRefAndState]
     );
 
     const onOutdoorsEntityClick = useCallback((event) => {
@@ -83,7 +86,12 @@ const IoTMap = () => {
 
         const worldMap = getWorldMap(window);
         setMapDataStateAndRef(worldMap);
-    }, [onOutdoorsEntityClick, getAccessTokenSilently, onIndoorsEntityClick]);
+    }, [
+        onOutdoorsEntityClick,
+        getAccessTokenSilently,
+        onIndoorsEntityClick,
+        setMapDataStateAndRef,
+    ]);
 
     const handlePopupClose = () => {
         setShowTelemetry(false);
