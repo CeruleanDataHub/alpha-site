@@ -109,7 +109,7 @@ const IoTMap = () => {
 };
 
 const hierarchiesQueryData = (hierarchyUUID) => ({
-    select: ["id"],
+    select: ["id", "name"],
     where: { uuid: hierarchyUUID },
     take: 1,
 });

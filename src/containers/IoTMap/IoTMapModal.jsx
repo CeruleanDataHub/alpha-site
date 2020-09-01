@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import IndoorEntityChart from "./IndoorEntityChart/IndoorEntityChart";
 import SpinnerTentative from "../shared/SpinnerTentative";
 import Tabs from "../shared/Tabs";
+import {Typography} from "@ceruleandatahub/react-components";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
 
@@ -27,9 +28,11 @@ const IoTMapModal = ({ hierarchy }) => {
     useEffect(() => {
         dispatchDevicesQuery(dispatch)(hierarchy);
     }, [dispatch, activeTab, hierarchy]);
-
     return (
         <>
+            <Typography color="black" size="large">
+                {hierarchy.name || ""}
+            </Typography>
             <TabsContainer>
                 <Tabs
                     tabs={tabs}
