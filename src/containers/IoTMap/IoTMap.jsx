@@ -8,8 +8,6 @@ import Modal from "../shared/Modal";
 import SpinnerTentative from "../shared/SpinnerTentative";
 import IoTMapModal from "./IoTMapModal";
 
-const highlightColor = [255, 255, 255, 50];
-
 const IoTMap = () => {
     const { getAccessTokenSilently } = useAuth0();
 
@@ -45,8 +43,6 @@ const IoTMap = () => {
 
     const onIndoorsEntityClick = useCallback(
         async (indoorEntity) => {
-            const indoors = indoorEntity.target;
-
             setClickedIndoorEntityRefAndState(indoorEntity);
 
             const hierarchyUUID = getHierarchyUUID(
@@ -54,9 +50,6 @@ const IoTMap = () => {
             );
 
             dispatchHierarchiesQuery(dispatch)(hierarchyUUID);
-
-            clearEntityHighlightsFor(indoors)(indoorEntity.ids);
-            setEntityHighlightsFor(indoors)(indoorEntity.ids, highlightColor);
 
             setShowTelemetry(true);
         },
@@ -168,14 +161,6 @@ const getIndoorMapEntityInformationGetter = get(
     window,
     "L.Wrld.indoorMapEntities.indoorMapEntityInformation"
 );
-
-const getClearEntityHighlights = (event) => get(event, "clearEntityHighlights");
-
-const clearEntityHighlightsFor = (indoors) => getClearEntityHighlights(indoors);
-
-const getSetEntityHighlights = (event) => get(event, "setEntityHighlights");
-
-const setEntityHighlightsFor = (indoors) => getSetEntityHighlights(indoors);
 
 const indoorMapEntityInformationGetter = (event) =>
     getIndoorMapEntityInformationGetter(event);
