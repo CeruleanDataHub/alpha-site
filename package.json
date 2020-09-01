@@ -5,7 +5,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^0.4.0",
     "@ceruleandatahub/middleware-redux": "^0.9.7",
-    "@ceruleandatahub/react-components": "^0.4.5",
+    "@ceruleandatahub/react-components": "^0.4.7",
     "@reduxjs/toolkit": "^1.3.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
