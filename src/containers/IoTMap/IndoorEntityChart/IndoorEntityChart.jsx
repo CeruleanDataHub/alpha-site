@@ -79,10 +79,12 @@ const getTimes = (latestHourlyTelemetry) => map(latestHourlyTelemetry, "time");
 const dispatchAggregateTelemetryQuery = (dispatch) =>
     flow([telemetryQueryData, aggregateTelemetryQuery, dispatch]);
 
-const populateSeriesData = (activeTab, lineChartValues) => ({
-    name: activeTab,
-    data: lineChartValues,
-});
+const populateSeriesData = (activeTab, lineChartValues) => [
+    {
+        name: activeTab,
+        data: lineChartValues,
+    },
+];
 
 const populateXAxisData = (dates) => [{ categories: dates }];
 
