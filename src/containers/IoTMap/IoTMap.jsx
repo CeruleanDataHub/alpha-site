@@ -23,16 +23,19 @@ const IoTMap = () => {
 
     const [mapData, _setMap] = useState({});
     const mapDataRef = useRef(mapData);
+    const setMapDataRef = (data) => (mapDataRef.current = data);
     const setMapDataStateAndRef = (mapData) => {
         _setMap(mapData);
-        mapDataRef.current = mapData;
+        setMapDataRef(mapData);
     };
 
     const [clickedIndoorEntity, _setClickedIndoorEntity] = useState({});
     const clickedIndoorEntityRef = useRef(clickedIndoorEntity);
+    const setClickedIndoorEntityRef = (data) =>
+        (clickedIndoorEntityRef.current = data);
     const setClickedIndoorEntityRefAndState = (clickedIndoorEntityData) => {
         _setClickedIndoorEntity(clickedIndoorEntityData);
-        clickedIndoorEntityRef.current = clickedIndoorEntityData;
+        setClickedIndoorEntityRef(clickedIndoorEntityData);
     };
 
     const [showTelemetry, setShowTelemetry] = useState(false);
