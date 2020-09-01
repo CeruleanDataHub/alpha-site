@@ -31,10 +31,18 @@ const IndoorEntityChart = ({ activeTab, device }) => {
     const series = populateSeriesData(activeTab, lineChartValues);
     const dates = getTimes(latestHourlyTelemetry).reverse();
     const xAxis = populateXAxisData(dates);
+    const options = {
+        legend: { enabled: false },
+    };
 
     return (
         <Content>
-            <Line title={`hourly ${activeTab}`} xAxis={xAxis} series={series} />
+            <Line
+                title={`hourly ${activeTab}`}
+                xAxis={xAxis}
+                series={series}
+                options={options}
+            />
         </Content>
     );
 };
