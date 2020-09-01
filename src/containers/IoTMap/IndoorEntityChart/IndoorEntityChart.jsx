@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import moment from "moment-timezone";
 import { Line } from "@ceruleandatahub/react-components";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,8 +30,12 @@ const IndoorEntityChart = ({ activeTab, device }) => {
     );
 
     const series = populateSeriesData(activeTab, lineChartValues);
+
     const dates = getTimes(latestHourlyTelemetry).reverse();
-    const xAxis = populateXAxisData(dates);
+
+    const formattedDates = formatDates(dates);
+
+    const xAxis = populateXAxisData(formattedDates);
     const options = {
         legend: { enabled: false },
     };
@@ -84,6 +89,10 @@ const populateSeriesData = (activeTab, lineChartValues) => ({
 });
 
 const populateXAxisData = (dates) => [{ categories: dates }];
+
+const formatDate = (date) => moment(date).format("DD.MM. hh:mm");
+
+const formatDates = (dates) => map(dates, (date) => formatDate(date));
 
 IndoorEntityChart.propTypes = {
     activeTab: PropTypes.string.isRequired,
