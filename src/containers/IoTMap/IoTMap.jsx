@@ -7,6 +7,7 @@ import { setToken } from "../../store";
 import Modal from "../shared/Modal";
 import SpinnerTentative from "../shared/SpinnerTentative";
 import IoTMapModal from "./IoTMapModal";
+import * as world from "wrld.js";
 
 const IoTMap = () => {
     const { getAccessTokenSilently } = useAuth0();
@@ -68,12 +69,12 @@ const IoTMap = () => {
 
         handleSetToken();
 
-        const indoors = getIndoorEntity(window);
+        const worldMap = initializeWorldMap(world);
+        const indoors = getIndoors(worldMap);
 
         setIndoorsEntityClickEventListener(indoors, onIndoorsEntityClick);
         setOutdoorsEntityClickEventListener(indoors, onOutdoorsEntityClick);
 
-        const worldMap = getWorldMap(window);
         setMapDataStateAndRef(worldMap);
     }, [
         onOutdoorsEntityClick,
@@ -123,7 +124,7 @@ const dispatchHierarchiesQuery = (dispatch) =>
 
 const getHierarchyUUID = (event) => ENTITY_TO_HIERARCHY[event.ids[0]];
 
-const populateWorldMap = (world) =>
+const initializeWorldMap = (world) =>
     world.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
         center: [60.19109, 24.94946],
         zoom: 15,
@@ -143,16 +144,10 @@ const getHierarchy = (state) => get(state, "hierarchy.hierarchies[0]");
 const setIndoorsEntityClickEventListener = (indoors, onIndoorsEntityClick) =>
     indoors.on("indoorentityclick", (event) => onIndoorsEntityClick(event));
 
-const getIndoors = (worldMap) => get(worldMap, "indoors");
-
-const getWorld = (window) => get(window, "L.Wrld");
+const getIndoors = (world) => get(world, "indoors");
 
 const getIndoorMapEntityData = (event) =>
     flow([findGetIndoorMapId, indoorMapEntityInformationGetter])(event);
-
-const getWorldMap = flow([getWorld, populateWorldMap]);
-
-const getIndoorEntity = flow([getWorldMap, getIndoors]);
 
 const getIndoorMapEntityInformationGetter = get(
     window,
