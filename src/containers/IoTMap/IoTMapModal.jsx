@@ -30,9 +30,11 @@ const IoTMapModal = ({ hierarchy }) => {
     }, [dispatch, activeTab, hierarchy]);
     return (
         <>
-            <Typography color="black" size="large">
-                {hierarchy.name || ""}
-            </Typography>
+            {hierarchy.name && (
+                <Typography color="black" size="large">
+                    {hierarchy.name}
+                </Typography>
+            )}
 
             <TabsContainer>
                 <Tabs
