@@ -8,6 +8,7 @@ import Modal from "../shared/Modal";
 import SpinnerTentative from "../shared/SpinnerTentative";
 import IoTMapModal from "./IoTMapModal";
 import * as world from "wrld.js";
+import { marker } from "wrld.js";
 
 const IoTMap = () => {
     const { getAccessTokenSilently } = useAuth0();
@@ -55,6 +56,16 @@ const IoTMap = () => {
 
     const onOutdoorsEntityClick = useCallback((event) => {
         const indoorMapEntityData = getIndoorMapEntityData(event);
+
+        createMarker(
+            [60.19109, 24.94946],
+            {
+                indoorMapId: "EIM-dbc3c842-5303-4ec5-989e-db20bc18bc58",
+                title: "Should be indoors",
+                indoorMapFloorId: 5,
+            },
+            mapDataRef.current
+        );
 
         indoorMapEntityData.addTo(mapDataRef.current);
         event.target.setFloor(5);
@@ -118,6 +129,9 @@ const ENTITY_TO_HIERARCHY = {
     765: "dc1b571f-44dc-4f71-ab79-487b2a412b2a", // Space
     771: "c57bedaf-1395-40a8-8cab-bfff1547757c", // Hacklab
 };
+
+const createMarker = (coordinates, options, mapDataRef) =>
+    marker(coordinates, options).addTo(mapDataRef);
 
 const dispatchHierarchiesQuery = (dispatch) =>
     flow([hierarchiesQueryData, findHierarchies, dispatch]);
