@@ -15,9 +15,7 @@ const IoTMap = () => {
 
     const mapRef = useRef(null);
 
-    const hierarchy = useSelector((state) => {
-        return getHierarchy(state);
-    });
+    const hierarchy = useSelector((state) => getHierarchy(state));
 
     const [mapData, _setMap] = useState({});
     const mapDataRef = useRef(mapData);
@@ -93,6 +91,7 @@ const IoTMap = () => {
     return (
         <div>
             <div id="map" ref={mapRef} />
+
             <Modal
                 isVisible={showTelemetry}
                 handlePopupClose={handlePopupClose}
