@@ -63,7 +63,7 @@ const getDevice = (state) => get(state, "device.devices[0]");
 IoTMapModal.propTypes = {
     device: PropTypes.shape({}),
     clickedIndoorEntity: PropTypes.shape({}).isRequired,
-    hierarchy: PropTypes.shape({}),
+    hierarchy: PropTypes.shape({ name: PropTypes.string }),
 };
 
 export default IoTMapModal;
