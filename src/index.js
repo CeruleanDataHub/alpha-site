@@ -6,7 +6,7 @@ import { createBrowserHistory } from "history";
 import { Provider } from "react-redux";
 import { Auth0Provider, withAuthenticationRequired } from "@auth0/auth0-react";
 import { store } from "./store.jsx";
-import IoTMap from "./containers/IoTMap/IoTMap.jsx";
+import MapContainer from "./containers/MapContainer.jsx";
 
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
@@ -39,7 +39,7 @@ ReactDOM.render(
                 {
                     <Router history={history}>
                         <Switch>
-                            <ProtectedRoute path="/" component={IoTMap} />
+                            <ProtectedRoute path="/" component={MapContainer} />
                         </Switch>
                     </Router>
                 }

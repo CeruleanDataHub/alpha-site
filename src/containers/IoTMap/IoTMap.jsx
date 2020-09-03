@@ -1,146 +1,93 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useDispatch, useSelector } from "react-redux";
-import { findHierarchies } from "@ceruleandatahub/middleware-redux";
 import { find, flow, get } from "lodash";
-import { setToken } from "../../store";
-import Modal from "../shared/Modal";
-import SpinnerTentative from "../shared/SpinnerTentative";
-import IoTMapModal from "./IoTMapModal";
 import * as world from "wrld.js";
 import { marker } from "wrld.js";
+import PropTypes from "prop-types";
 
-const IoTMap = () => {
-    const { getAccessTokenSilently } = useAuth0();
-
-    const dispatch = useDispatch();
-
-    const hierarchy = useSelector((state) => getHierarchy(state));
-
-    const [mapData, _setMap] = useState({});
+const IoTMap = ({
+    setShowIndoorEntityModal,
+    setClickedIndoorEntity,
+    invokeOnIndoorsEntityClick,
+    API_KEY,
+    centerCoordinates,
+    indoorMarkers,
+    outdoorMarkers,
+    id,
+}) => {
+    const [mapData, _setMapData] = useState({});
     const mapDataRef = useRef(mapData);
     const setMapDataRef = (data) => (mapDataRef.current = data);
     const setMapDataStateAndRef = useCallback((mapData) => {
-        _setMap(mapData);
+        _setMapData(mapData);
         setMapDataRef(mapData);
     }, []);
 
-    const [clickedIndoorEntity, _setClickedIndoorEntity] = useState({});
-    const clickedIndoorEntityRef = useRef(clickedIndoorEntity);
-    const setClickedIndoorEntityRef = (data) =>
-        (clickedIndoorEntityRef.current = data);
-    const setClickedIndoorEntityRefAndState = useCallback(
-        (clickedIndoorEntityData) => {
-            _setClickedIndoorEntity(clickedIndoorEntityData);
-            setClickedIndoorEntityRef(clickedIndoorEntityData);
-        },
-        []
-    );
-
-    const [showTelemetry, setShowTelemetry] = useState(false);
-
     const onIndoorsEntityClick = useCallback(
         async (indoorEntity) => {
-            setClickedIndoorEntityRefAndState(indoorEntity);
+            invokeOnIndoorsEntityClick(indoorEntity);
 
-            const hierarchyUUID = getHierarchyUUID(
-                clickedIndoorEntityRef.current
-            );
-
-            dispatchHierarchiesQuery(dispatch)(hierarchyUUID);
-
-            setShowTelemetry(true);
+            setClickedIndoorEntity(indoorEntity);
+            setShowIndoorEntityModal(true);
         },
-        [dispatch, setClickedIndoorEntityRefAndState]
+        [
+            invokeOnIndoorsEntityClick,
+            setClickedIndoorEntity,
+            setShowIndoorEntityModal,
+        ]
     );
 
-    const onOutdoorsEntityClick = useCallback((event) => {
-        const indoorMapEntityData = getIndoorMapEntityData(event);
+    const onOutdoorsEntityClick = useCallback(
+        (event) => {
+            const indoorMapEntityData = getIndoorMapEntityData(event);
 
-        createMarker(
-            [60.19109, 24.94946],
-            {
-                indoorMapId: "EIM-dbc3c842-5303-4ec5-989e-db20bc18bc58",
-                title: "Should be indoors",
-                indoorMapFloorId: 5,
-            },
-            mapDataRef.current
-        );
+            createMarkers(indoorMarkers, mapDataRef.current);
 
-        indoorMapEntityData.addTo(mapDataRef.current);
-        event.target.setFloor(5);
-    }, []);
+            indoorMapEntityData.addTo(mapDataRef.current);
+            event.target.setFloor(5);
+        },
+        [indoorMarkers]
+    );
 
     useEffect(() => {
-        const handleSetToken = async () => {
-            const token = await getAccessTokenSilently();
-
-            return setToken(token);
-        };
-
-        handleSetToken();
-
-        const worldMap = initializeWorldMap(world);
+        const worldMap = initializeWorldMap(
+            id,
+            world,
+            API_KEY,
+            centerCoordinates
+        );
         const indoors = getIndoors(worldMap);
 
-        setIndoorsEntityClickEventListener(indoors, onIndoorsEntityClick);
         setOutdoorsEntityClickEventListener(indoors, onOutdoorsEntityClick);
+        setIndoorsEntityClickEventListener(indoors, onIndoorsEntityClick);
+
+        createMarkers(outdoorMarkers, mapDataRef.current);
 
         setMapDataStateAndRef(worldMap);
     }, [
         onOutdoorsEntityClick,
-        getAccessTokenSilently,
         onIndoorsEntityClick,
         setMapDataStateAndRef,
+        id,
+        API_KEY,
+        centerCoordinates,
+        outdoorMarkers,
     ]);
 
-    const handlePopupClose = () => {
-        setShowTelemetry(false);
-    };
-
-    return (
-        <div>
-            <div id="map" />
-
-            <Modal
-                isVisible={showTelemetry}
-                handlePopupClose={handlePopupClose}
-            >
-                <SpinnerTentative condition={!!hierarchy}>
-                    <IoTMapModal
-                        clickedIndoorEntity={clickedIndoorEntity}
-                        hierarchy={hierarchy}
-                    />
-                </SpinnerTentative>
-            </Modal>
-        </div>
-    );
-};
-
-const hierarchiesQueryData = (hierarchyUUID) => ({
-    select: ["id", "name"],
-    where: { uuid: hierarchyUUID },
-    take: 1,
-});
-
-const ENTITY_TO_HIERARCHY = {
-    7214: "8597b49a-de5d-4224-99e9-aa969fbcd07d", // Solar
-    743: "61ea841a-52b7-4369-9dd5-2e552fae7b24", // Pluto
-    765: "dc1b571f-44dc-4f71-ab79-487b2a412b2a", // Space
-    771: "c57bedaf-1395-40a8-8cab-bfff1547757c", // Hacklab
+    return <div id={id} />;
 };
 
 const createMarker = (coordinates, options, mapDataRef) =>
     marker(coordinates, options).addTo(mapDataRef);
 
-const dispatchHierarchiesQuery = (dispatch) =>
-    flow([hierarchiesQueryData, findHierarchies, dispatch]);
+const createMarkers = (markers, mapData) =>
+    markers &&
+    markers.forEach(({ coordinates, options }) =>
+        createMarker(coordinates, options, mapData)
+    );
 
-const getHierarchyUUID = (event) => ENTITY_TO_HIERARCHY[event.ids[0]];
-
-const initializeWorldMap = (world) =>
-    world.map("map", "e7dfd119fdb36ca4274823b3039ab84d", {
-        center: [60.19109, 24.94946],
+const initializeWorldMap = (id, worldInitializer, API_KEY, centerCoordinates) =>
+    worldInitializer.map(id, API_KEY, {
+        center: centerCoordinates,
         zoom: 15,
         indoorsEnabled: true,
         //Reduce CPU Usage
@@ -150,27 +97,38 @@ const initializeWorldMap = (world) =>
         idleSecondsBeforeFrameRateThrottle: 15.0,
     });
 
+const getIndoors = (world) => get(world, "indoors");
+
 const setOutdoorsEntityClickEventListener = (indoors, onOutdoorsEntityClick) =>
     indoors.on("indoormapenter", (event) => onOutdoorsEntityClick(event));
-
-const getHierarchy = (state) => get(state, "hierarchy.hierarchies[0]");
 
 const setIndoorsEntityClickEventListener = (indoors, onIndoorsEntityClick) =>
     indoors.on("indoorentityclick", (event) => onIndoorsEntityClick(event));
 
-const getIndoors = (world) => get(world, "indoors");
+const findGetIndoorMapId = (event) => find(event, "getIndoorMapId");
 
-const getIndoorMapEntityData = (event) =>
-    flow([findGetIndoorMapId, indoorMapEntityInformationGetter])(event);
+const indoorMapEntityInformationGetter = (event) =>
+    getIndoorMapEntityInformationGetter(event);
+
+const getIndoorMapEntityData = flow([
+    findGetIndoorMapId,
+    indoorMapEntityInformationGetter,
+]);
 
 const getIndoorMapEntityInformationGetter = get(
     window,
     "L.Wrld.indoorMapEntities.indoorMapEntityInformation"
 );
 
-const indoorMapEntityInformationGetter = (event) =>
-    getIndoorMapEntityInformationGetter(event);
-
-const findGetIndoorMapId = (event) => find(event, "getIndoorMapId");
+IoTMap.propTypes = {
+    setShowIndoorEntityModal: PropTypes.func.isRequired,
+    setClickedIndoorEntity: PropTypes.func.isRequired,
+    invokeOnIndoorsEntityClick: PropTypes.func.isRequired,
+    API_KEY: PropTypes.string.isRequired,
+    centerCoordinates: PropTypes.arrayOf(PropTypes.number).isRequired,
+    indoorMarkers: PropTypes.arrayOf(PropTypes.shape({})),
+    outdoorMarkers: PropTypes.arrayOf(PropTypes.shape({})),
+    id: PropTypes.string.isRequired,
+};
 
 export default IoTMap;
