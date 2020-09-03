@@ -11,7 +11,7 @@ const Content = styled.div`
     padding: 0.2em 0 0 0.1em;
 `;
 
-const IndoorEntityChart = ({ activeTab, device }) => {
+const TelemetryChart = ({ activeTab, device }) => {
     const dispatch = useDispatch();
 
     const latestHourlyTelemetry = useSelector(
@@ -95,9 +95,9 @@ const formatDates = (dates) => map(dates, (date) => formatDate(date));
 const getDates = (telemetryData) =>
     flow([getTimes, reverse, formatDates])(telemetryData);
 
-IndoorEntityChart.propTypes = {
+TelemetryChart.propTypes = {
     activeTab: PropTypes.string.isRequired,
     device: PropTypes.shape({}),
 };
 
-export default IndoorEntityChart;
+export default TelemetryChart;

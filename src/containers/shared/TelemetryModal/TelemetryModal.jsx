@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { flow, get } from "lodash";
 import PropTypes from "prop-types";
-import IndoorEntityChart from "./IndoorEntityChart/IndoorEntityChart";
-import SpinnerTentative from "../shared/SpinnerTentative";
-import Tabs from "../shared/Tabs";
+import IndoorEntityChart from "./TelemetryChart/TelemetryChart";
+import SpinnerTentative from "../../shared/SpinnerTentative";
+import Tabs from "../../shared/Tabs";
 import { Typography } from "@ceruleandatahub/react-components";
 
 const tabs = ["Temperature", "Humidity", "Pressure"];
@@ -16,7 +16,7 @@ const TabsContainer = styled.div`
     padding: 0.2em 0 0 0.1em;
 `;
 
-const IoTMapModal = ({ hierarchy }) => {
+const TelemetryModal = ({ hierarchy }) => {
     const dispatch = useDispatch();
 
     const device = useSelector((state) => {
@@ -62,10 +62,10 @@ const devicesQueryData = (hierarchy) => ({
 
 const getDevice = (state) => get(state, "device.devices[0]");
 
-IoTMapModal.propTypes = {
+TelemetryModal.propTypes = {
     device: PropTypes.shape({}),
     clickedIndoorEntity: PropTypes.shape({}).isRequired,
     hierarchy: PropTypes.shape({ name: PropTypes.string }),
 };
 
-export default IoTMapModal;
+export default TelemetryModal;

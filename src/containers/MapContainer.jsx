@@ -6,7 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { setToken } from "../store";
 import Modal from "./shared/Modal";
 import SpinnerTentative from "./shared/SpinnerTentative";
-import TelemetryModal from "./IoTMap/TelemetryModal";
+import TelemetryModal from "./shared/TelemetryModal/TelemetryModal";
 import { findHierarchies } from "@ceruleandatahub/middleware-redux";
 
 const MapContainer = () => {
